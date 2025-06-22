@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat d'Équipe - Plateforme de Collaboration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #4f46e5;
+            --sidebar-bg: #1e293b;
+            --chat-bg: #f8fafc;
+            --user-message: #dbeafe;
+            --other-message: #ffffff;
+            --input-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #334155;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            background-color: #0f172a;
+        }
+
+        .team-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .team-logo i {
+            color: var(--primary-color);
+        }
+
+        .search-container {
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .search-box {
+            background-color: #334155;
+            border-radius: 24px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            outline: none;
+        }
+
+        .channels-section, .members-section {
+            padding: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .channel-item, .member-item {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .channel-item:hover, .member-item:hover, .active-channel {
+            background-color: #334155;
+        }
+
+        .channel-item i, .member-item i {
+            color: #94a3b8;
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .member-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .status-online {
+            background-color: #10b981;
+        }
+
+        .status-offline {
+            background-color: #64748b;
+        }
+
+        .status-away {
+            background-color: #f59e0b;
+        }
+
+        /* Chat area */
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+        }
+
+        .chat-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: white;
+        }
+
+        .chat-info {
+            flex-grow: 1;
+        }
+
+        .chat-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+
+        .chat-status {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-action-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chat-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .messages-container {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            background-color: var(--user-message);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .other-message {
+            background-color: var(--other-message);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-left: 10px;
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-action-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 3px;
+        }
+
+        .message-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .input-container {
+            padding: 20px;
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-action-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .input-action-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .message-input {
+            flex-grow: 1;
+            border: none;
+            background-color: var(--input-bg);
+            padding: 15px 20px;
+            border-radius: 24px;
+            font-size: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            outline: none;
+            resize: none;
+            height: 50px;
+            max-height: 150px;
+        }
+
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .channel-name, 
+            .sidebar .member-name,
+            .sidebar .section-title,
+            .search-box input {
+                display: none;
+            }
+            .search-box {
+                justify-content: center;
+            }
+            .channel-item, .member-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            .member-status {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+            }
+            .member-item {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="team-logo">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span>TeamChat</span>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Rechercher...">
+                </div>
+            </div>
+            
+            <div class="channels-section">
+                <div class="section-title">Canaux</div>
+                <div class="channel-item active-channel">
+                    <i class="bi bi-hash"></i>
+                    <span class="channel-name">Général</span>
+                </div>
+                <div class="channel-item">
+                    <i class="bi bi-hash"></i>
+                    <span class="channel-name">Développement</span>
+                </div>
+                <div class="channel-item">
+                    <i class="bi bi-hash"></i>
+                    <span class="channel-name">Design</span>
+                </div>
+                <div class="channel-item">
+                    <i class="bi bi-hash"></i>
+                    <span class="channel-name">Marketing</span>
+                </div>
+                <div class="channel-item">
+                    <i class="bi bi-plus-circle"></i>
+                    <span class="channel-name">Ajouter un canal</span>
+                </div>
+            </div>
+            
+            <div class="members-section">
+                <div class="section-title">Membres en ligne</div>
+                <div class="member-item">
+                    <img src="https://randomuser.me/api/portraits/women/43.jpg" class="member-avatar">
+                    <span class="member-name">Marie Dupont</span>
+                    <div class="member-status status-online"></div>
+                </div>
+                <div class="member-item">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="member-avatar">
+                    <span class="member-name">Thomas Bernard</span>
+                    <div class="member-status status-online"></div>
+                </div>
+                <div class="member-item">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="member-avatar">
+                    <span class="member-name">Sophie Lambert</span>
+                    <div class="member-status status-away"></div>
+                </div>
+                <div class="member-item">
+                    <img src="https://randomuser.me/api/portraits/men/22.jpg" class="member-avatar">
+                    <span class="member-name">Jean Martin</span>
+                    <div class="member-status status-online"></div>
+                </div>
+                <div class="member-item">
+                    <img src="https://randomuser.me/api/portraits/women/26.jpg" class="member-avatar">
+                    <span class="member-name">Claire Petit</span>
+                    <div class="member-status status-offline"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <div class="chat-title"># Général</div>
+                    <div class="chat-status">5 membres en ligne</div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <button class="chat-action-btn">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    <button class="chat-action-btn">
+                        <i class="bi bi-pin-angle"></i>
+                    </button>
+                    <button class="chat-action-btn">
+                        <i class="bi bi-people"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages will be added here dynamically -->
+            </div>
+            
+            <div class="input-container">
+                <div class="input-box">
+                    <div class="input-actions">
+                        <button class="input-action-btn">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                        <button class="input-action-btn">
+                            <i class="bi bi-emoji-smile"></i>
+                        </button>
+                        <button class="input-action-btn">
+                            <i class="bi bi-paperclip"></i>
+                        </button>
+                    </div>
+                    <textarea class="message-input" id="messageInput" placeholder="Écrire un message..."></textarea>
+                    <button class="send-btn" id="sendButton">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Messages data
+        const messages = [
+            {
+                sender: "Marie Dupont",
+                avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+                content: "Bonjour à tous ! J'ai terminé le design du nouveau tableau de bord. J'ai envoyé les maquettes dans le canal #design.",
+                time: "09:15",
+                type: "other"
+            },
+            {
+                sender: "Thomas Bernard",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                content: "Super travail Marie ! Je vais commencer l'implémentation cet après-midi.",
+                time: "09:20",
+                type: "other"
+            },
+            {
+                sender: "Vous",
+                avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+                content: "Merci Marie, les designs sont excellents. Thomas, pourrais-tu nous donner une estimation du temps nécessaire pour le développement ?",
+                time: "09:25",
+                type: "user"
+            },
+            {
+                sender: "Thomas Bernard",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                content: "Je pense avoir besoin d'environ 3 jours pour la partie frontend. J'aurai peut-être besoin d'aide pour l'intégration avec le backend.",
+                time: "09:30",
+                type: "other"
+            },
+            {
+                sender: "Sophie Lambert",
+                avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+                content: "Je suis disponible pour aider sur l'intégration API. On pourrait faire une réunion technique demain matin ?",
+                time: "09:35",
+                type: "other"
+            }
+        ];
+
+        // Function to render messages
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(msg.type === 'user' ? 'user-message' : 'other-message');
+                
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        ${msg.type === 'other' ? `<img src="${msg.avatar}" class="message-avatar">` : ''}
+                        <div class="message-sender">${msg.sender}</div>
+                        <div class="message-time">${msg.time}</div>
+                        <div class="message-actions">
+                            <button class="message-action-btn">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <button class="message-action-btn">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                `;
+                
+                container.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Function to add a new message
+        function addMessage(content, isUser = true) {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + 
+                         now.getMinutes().toString().padStart(2, '0');
+            
+            const newMessage = {
+                sender: isUser ? "Vous" : "Thomas Bernard",
+                avatar: isUser ? "https://randomuser.me/api/portraits/men/22.jpg" : "https://randomuser.me/api/portraits/men/32.jpg",
+                content: content,
+                time: time,
+                type: isUser ? "user" : "other"
+            };
+            
+            messages.push(newMessage);
+            renderMessages();
+        }
+
+        // Auto-reply function
+        function sendAutoReply() {
+            const replies = [
+                "Je suis d'accord avec ça !",
+                "Merci pour l'information !",
+                "Je vais regarder ça de mon côté.",
+                "On pourrait en discuter lors de notre prochaine réunion ?",
+                "J'ai une question à ce sujet...",
+                "Super idée !"
+            ];
+            
+            setTimeout(() => {
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                addMessage(randomReply, false);
+            }, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessage(message);
+                input.value = '';
+                sendAutoReply();
+            }
+        });
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendButton').click();
+            }
+        });
+
+        // Auto-expand textarea
+        document.getElementById('messageInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight > 150 ? 150 : this.scrollHeight) + 'px';
+        });
+
+        // Initialize messages
+        renderMessages();
+
+        // Simulate a welcome message
+        setTimeout(() => {
+            addMessage("Bienvenue sur notre plateforme de chat d'équipe ! 👋", false);
+        }, 1000);
+    </script>
+</body>
+</html>

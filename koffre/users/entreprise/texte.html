@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat d'Équipe Alternative</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #5e72e4;
+            --secondary-color: #11cdef;
+            --sidebar-bg: #2d3748;
+            --chat-bg: #f7fafc;
+            --user-message: #e9f7ff;
+            --other-message: #ffffff;
+            --input-bg: #ffffff;
+            --online: #2dce89;
+            --away: #fb6340;
+            --offline: #8392ab;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #edf2f7;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .chat-app {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        /* Sidebar alternative */
+        .sidebar-alt {
+            width: 280px;
+            background: linear-gradient(180deg, var(--sidebar-bg), #1a202c);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2d3748;
+        }
+
+        .app-header {
+            padding: 25px 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .app-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .app-logo i {
+            color: var(--secondary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            gap: 15px;
+            border-bottom: 1px solid #2d3748;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .user-info {
+            flex-grow: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: var(--online);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--online);
+        }
+
+        .channels-container {
+            padding: 20px 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .section-title-alt {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #a0aec0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .channel-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .channel-item-alt {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .channel-item-alt:hover, .channel-active {
+            background-color: rgba(94, 114, 228, 0.2);
+        }
+
+        .channel-icon {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .members-container {
+            padding: 20px 15px;
+            border-top: 1px solid #2d3748;
+        }
+
+        .member-item-alt {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            gap: 12px;
+        }
+
+        .member-avatar-alt {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+        }
+
+        .member-status-alt {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--sidebar-bg);
+        }
+
+        .status-online-alt {
+            background-color: var(--online);
+        }
+
+        .status-away-alt {
+            background-color: var(--away);
+        }
+
+        .status-offline-alt {
+            background-color: var(--offline);
+        }
+
+        /* Chat area alternative */
+        .chat-area-alt {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+        }
+
+        .chat-header-alt {
+            padding: 15px 25px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .chat-info-alt {
+            flex-grow: 1;
+        }
+
+        .chat-title-alt {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #2d3748;
+            margin-bottom: 3px;
+        }
+
+        .chat-status-alt {
+            font-size: 0.9rem;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-actions-alt {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chat-action-btn-alt {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .chat-action-btn-alt:hover {
+            color: var(--primary-color);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--away);
+            color: white;
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .messages-container-alt {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" opacity="0.05"><rect width="100" height="100" fill="none" stroke="gray" stroke-width="2"/></svg>');
+        }
+
+        .message-date {
+            text-align: center;
+            color: #a0aec0;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .message-date::before, .message-date::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #e2e8f0;
+        }
+
+        .message-date::before {
+            left: 0;
+        }
+
+        .message-date::after {
+            right: 0;
+        }
+
+        .message-alt {
+            max-width: 75%;
+            padding: 18px;
+            margin-bottom: 25px;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.4s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message-alt {
+            background-color: var(--user-message);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            margin-right: 15px;
+        }
+
+        .other-message-alt {
+            background-color: var(--other-message);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            margin-left: 15px;
+        }
+
+        .message-header-alt {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .message-avatar-alt {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-sender-alt {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #2d3748;
+        }
+
+        .message-time-alt {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-left: 12px;
+        }
+
+        .message-content-alt {
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .message-actions-alt {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-alt:hover .message-actions-alt {
+            opacity: 1;
+        }
+
+        .message-action-btn-alt {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 5px;
+            transition: all 0.2s;
+        }
+
+        .message-action-btn-alt:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .input-container-alt {
+            padding: 20px 30px;
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-box-alt {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background-color: #edf2f7;
+            border-radius: 50px;
+            padding: 10px 20px;
+        }
+
+        .input-actions-alt {
+            display: flex;
+            gap: 15px;
+        }
+
+        .input-action-btn-alt {
+            background: none;
+            border: none;
+            color: #a0aec0;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .input-action-btn-alt:hover {
+            background-color: rgba(94, 114, 228, 0.1);
+            color: var(--primary-color);
+        }
+
+        .message-input-alt {
+            flex-grow: 1;
+            border: none;
+            background-color: transparent;
+            padding: 12px 5px;
+            font-size: 1rem;
+            outline: none;
+            resize: none;
+            height: 25px;
+            max-height: 120px;
+        }
+
+        .send-btn-alt {
+            background: linear-gradient(135deg, var(--primary-color), #825ee4);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(94, 114, 228, 0.3);
+        }
+
+        .send-btn-alt:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(94, 114, 228, 0.4);
+        }
+
+        /* Responsive design */
+        @media (max-width: 992px) {
+            .sidebar-alt {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-alt {
+                width: 70px;
+            }
+            .channel-name, 
+            .member-name,
+            .section-title-alt span,
+            .user-info {
+                display: none;
+            }
+            .user-profile {
+                justify-content: center;
+                padding: 15px 10px;
+            }
+            .channel-item-alt, .member-item-alt {
+                justify-content: center;
+                padding: 15px;
+            }
+            .app-logo span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-app">
+        <!-- Sidebar alternative -->
+        <div class="sidebar-alt">
+            <div class="app-header">
+                <div class="app-logo">
+                    <i class="bi bi-chat-square-dots-fill"></i>
+                    <span>TeamConnect</span>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="user-avatar">
+                <div class="user-info">
+                    <div class="user-name">Thomas Bernard</div>
+                    <div class="user-status">
+                        <div class="status-dot"></div>
+                        <span>En ligne</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="channels-container">
+                <div class="section-title-alt">
+                    <i class="bi bi-hash"></i>
+                    <span>Canaux</span>
+                </div>
+                <ul class="channel-list">
+                    <li class="channel-item-alt channel-active">
+                        <i class="bi bi-people-fill channel-icon"></i>
+                        <span class="channel-name">Général</span>
+                    </li>
+                    <li class="channel-item-alt">
+                        <i class="bi bi-code-slash channel-icon"></i>
+                        <span class="channel-name">Développement</span>
+                    </li>
+                    <li class="channel-item-alt">
+                        <i class="bi bi-palette-fill channel-icon"></i>
+                        <span class="channel-name">Design</span>
+                    </li>
+                    <li class="channel-item-alt">
+                        <i class="bi bi-megaphone-fill channel-icon"></i>
+                        <span class="channel-name">Marketing</span>
+                    </li>
+                    <li class="channel-item-alt">
+                        <i class="bi bi-plus-circle-fill channel-icon"></i>
+                        <span class="channel-name">Ajouter un canal</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="members-container">
+                <div class="section-title-alt">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Membres en ligne</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/women/43.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-online-alt"></div>
+                    </div>
+                    <span class="member-name">Marie Dupont</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-away-alt"></div>
+                    </div>
+                    <span class="member-name">Sophie Lambert</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/men/22.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-online-alt"></div>
+                    </div>
+                    <span class="member-name">Jean Martin</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/women/26.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-offline-alt"></div>
+                    </div>
+                    <span class="member-name">Claire Petit</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/women/26.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-offline-alt"></div>
+                    </div>
+                    <span class="member-name">Claire Petit</span>
+                </div>
+                <div class="member-item-alt">
+                    <div class="member-avatar-container">
+                        <img src="https://randomuser.me/api/portraits/women/26.jpg" class="member-avatar-alt">
+                        <div class="member-status-alt status-offline-alt"></div>
+                    </div>
+                    <span class="member-name">Claire Petit</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat area alternative -->
+        <div class="chat-area-alt">
+            <div class="chat-header-alt">
+                <div class="chat-info-alt">
+                    <div class="chat-title-alt">Canal Général</div>
+                    <div class="chat-status-alt">
+                        <i class="bi bi-circle-fill" style="color: var(--online); font-size: 0.7rem;"></i>
+                        <span>4 membres en ligne</span>
+                    </div>
+                </div>
+                <div class="chat-actions-alt">
+                    <button class="chat-action-btn-alt">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <button class="chat-action-btn-alt">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button class="chat-action-btn-alt">
+                        <i class="bi bi-pin-angle"></i>
+                    </button>
+                    <button class="chat-action-btn-alt">
+                        <i class="bi bi-info-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="messages-container-alt" id="messagesContainerAlt">
+                <div class="message-date">Aujourd'hui</div>
+                
+                <!-- Messages will be added here dynamically -->
+            </div>
+            
+            <div class="input-container-alt">
+                <div class="input-box-alt">
+                    <div class="input-actions-alt">
+                        <button class="input-action-btn-alt">
+                            <i class="bi bi-plus-circle"></i>
+                        </button>
+                        <button class="input-action-btn-alt">
+                            <i class="bi bi-emoji-smile"></i>
+                        </button>
+                        <button class="input-action-btn-alt">
+                            <i class="bi bi-paperclip"></i>
+                        </button>
+                    </div>
+                    <textarea class="message-input-alt" id="messageInputAlt" placeholder="Écrire un message..."></textarea>
+                    <button class="send-btn-alt" id="sendButtonAlt">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Messages data
+        const messagesAlt = [
+            {
+                sender: "Marie Dupont",
+                avatar: "https://randomuser.me/api/portraits/women/43.jpg",
+                content: "Bonjour tout le monde ! J'ai finalisé les designs pour la nouvelle interface. Qu'en pensez-vous ?",
+                time: "09:15",
+                type: "other"
+            },
+            {
+                sender: "Thomas Bernard",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                content: "Ils sont superbes Marie ! Particulièrement l'organisation du tableau de bord.",
+                time: "09:18",
+                type: "other"
+            },
+            {
+                sender: "Vous",
+                avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+                content: "Je suis d'accord avec Thomas. La palette de couleurs est vraiment harmonieuse. Pourrais-tu partager les fichiers sur le canal design?",
+                time: "09:22",
+                type: "user"
+            },
+            {
+                sender: "Sophie Lambert",
+                avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+                content: "J'ai une suggestion pour la page de profil utilisateur - ajouter un indicateur de progression visible.",
+                time: "09:30",
+                type: "other"
+            }
+        ];
+
+        // Function to render messages
+        function renderMessagesAlt() {
+            const container = document.getElementById('messagesContainerAlt');
+            container.innerHTML = '<div class="message-date">Aujourd\'hui</div>';
+            
+            messagesAlt.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message-alt');
+                messageElement.classList.add(msg.type === 'user' ? 'user-message-alt' : 'other-message-alt');
+                
+                messageElement.innerHTML = `
+                    <div class="message-header-alt">
+                        ${msg.type === 'other' ? `<img src="${msg.avatar}" class="message-avatar-alt">` : ''}
+                        <div class="message-sender-alt">${msg.sender}</div>
+                        <div class="message-time-alt">${msg.time}</div>
+                        <div class="message-actions-alt">
+                            <button class="message-action-btn-alt">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <button class="message-action-btn-alt">
+                                <i class="bi bi-reply"></i>
+                            </button>
+                            <button class="message-action-btn-alt">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="message-content-alt">${msg.content}</div>
+                `;
+                
+                container.appendChild(messageElement);
+            });
+            
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Function to add a new message
+        function addMessageAlt(content, isUser = true) {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + 
+                         now.getMinutes().toString().padStart(2, '0');
+            
+            const newMessage = {
+                sender: isUser ? "Vous" : "Sophie Lambert",
+                avatar: isUser ? "https://randomuser.me/api/portraits/men/32.jpg" : "https://randomuser.me/api/portraits/women/68.jpg",
+                content: content,
+                time: time,
+                type: isUser ? "user" : "other"
+            };
+            
+            messagesAlt.push(newMessage);
+            renderMessagesAlt();
+        }
+
+        // Auto-reply function
+        function sendAutoReplyAlt() {
+            const replies = [
+                "Bonne idée ! Je vais regarder ça",
+                "Merci pour votre retour !",
+                "Je pense que nous devrions en discuter lors de la réunion de demain",
+                "J'ai ajouté cette fonctionnalité à notre backlog",
+                "Pourrais-tu me donner plus de détails sur cette suggestion ?"
+            ];
+            
+            setTimeout(() => {
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                addMessageAlt(randomReply, false);
+            }, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('sendButtonAlt').addEventListener('click', () => {
+            const input = document.getElementById('messageInputAlt');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessageAlt(message);
+                input.value = '';
+                sendAutoReplyAlt();
+            }
+        });
+
+        document.getElementById('messageInputAlt').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendButtonAlt').click();
+            }
+        });
+
+        // Auto-expand textarea
+        document.getElementById('messageInputAlt').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight > 120 ? 120 : this.scrollHeight) + 'px';
+        });
+
+        // Initialize messages
+        renderMessagesAlt();
+
+        // Simulate a welcome message
+        setTimeout(() => {
+            addMessageAlt("Bienvenue dans le canal général ! N'hésitez pas à partager vos idées et questions.", false);
+        }, 1000);
+    </script>
+</body>
+</html>
