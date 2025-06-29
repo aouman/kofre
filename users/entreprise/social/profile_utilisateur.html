@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marie Dubois - Innovatech Solutions | Connect'Entreprises</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a66c2;
+            --secondary: #378fe9;
+            --dark: #1d2226;
+            --light: #f3f2ef;
+            --gray: #eef3f8;
+            --text-dark: #222222;
+            --text-light: #666666;
+            --success: #5e9b6b;
+            --warning: #e7a33e;
+            --danger: #d74345;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light);
+            color: var(--text-dark);
+            padding-top: 70px;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+        
+        /* Topbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo i {
+            color: var(--primary);
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 30px;
+        }
+        
+        .search-bar .form-control {
+            background-color: var(--gray);
+            border-radius: 30px;
+            border: none;
+            padding: 10px 20px;
+        }
+        
+        .topbar-actions .btn {
+            margin-left: 10px;
+        }
+        
+        /* User Header */
+        .user-header {
+            position: relative;
+            margin-bottom: 150px;
+        }
+        
+        .user-banner {
+            height: 250px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .user-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-info {
+            position: absolute;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .user-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin: -120px auto 20px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        /* Tabs */
+        .user-tabs {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 20px 25px;
+            color: var(--text-light);
+            font-weight: 500;
+            border: none;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            background: transparent;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            padding: 30px 0;
+        }
+        
+        /* Cards */
+        .card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        /* About Section */
+        .about-section {
+            margin-bottom: 30px;
+        }
+        
+        .about-card .card-body {
+            padding: 25px;
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+        
+        /* Experience Section */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-left: 15px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--gray);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 3px solid white;
+        }
+        
+        .timeline-date {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        /* Skills Section */
+        .skill-item {
+            margin-bottom: 20px;
+        }
+        
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .skill-bar {
+            height: 8px;
+            background-color: var(--gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px;
+        }
+        
+        /* Recommendations */
+        .recommendation-card {
+            border-left: 3px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .recommender {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .recommender-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        /* Activity */
+        .activity-item {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .user-info {
+                width: 95%;
+            }
+            
+            .user-avatar {
+                width: 120px;
+                height: 120px;
+                margin-top: -100px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 0 15px;
+            }
+            
+            .search-bar {
+                margin: 0 15px;
+            }
+            
+            .user-banner {
+                height: 200px;
+            }
+            
+            .user-info {
+                bottom: -80px;
+                padding: 15px;
+            }
+            
+            .user-avatar {
+                width: 100px;
+                height: 100px;
+                margin-top: -80px;
+            }
+            
+            .user-name {
+                font-size: 1.5rem;
+            }
+            
+            .user-stats {
+                gap: 15px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        /* Badges */
+        .badge-certified {
+            background: linear-gradient(135deg, var(--warning) 0%, #f5c97a 100%);
+            color: white;
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        /* Connections */
+        .connection-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .connection-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .connection-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid var(--gray);
+        }
+        
+        .connection-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Topbar -->
+    <nav class="topbar">
+        <div class="logo">
+            <i class="fas fa-handshake"></i> Connect'Entreprises
+        </div>
+        <div class="search-bar">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Rechercher des entreprises, contacts...">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <a href="#" class="btn btn-outline-secondary">
+                <i class="fas fa-bell"></i>
+            </a>
+            <a href="#" class="btn btn-outline-secondary">
+                <i class="fas fa-envelope"></i>
+            </a>
+            <a href="#" class="btn btn-primary">
+                <i class="fas fa-user me-2"></i>Mon profil
+            </a>
+        </div>
+    </nav>
+
+    <!-- User Header -->
+    <section class="user-header">
+        <div class="user-banner">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='250' viewBox='0 0 1200 250'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230a66c2'/%3E%3Cstop offset='100%25' stop-color='%23378fe9'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='250' fill='url(%23grad)'/%3E%3C/svg%3E" alt="Bannière Marie Dubois">
+        </div>
+        <div class="user-info fade-in">
+            <div class="user-avatar">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150'%3E%3Ccircle cx='75' cy='75' r='75' fill='%230a66c2'/%3E%3Ccircle cx='75' cy='60' r='25' fill='white'/%3E%3Cpath d='M75,85 C95,85 110,100 110,120 L40,120 C40,100 55,85 75,85 Z' fill='white'/%3E%3C/svg%3E" alt="Marie Dubois">
+            </div>
+            <h1 class="user-name">Marie Dubois <span class="badge-certified">Certifié</span></h1>
+            <p class="user-position">Directrice Marketing chez Innovatech Solutions</p>
+            <p class="text-muted mb-4">Paris, France • <a href="#" class="text-decoration-none">Contact info</a></p>
+            
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <button class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Connecter
+                </button>
+                <button class="btn btn-outline-primary">
+                    <i class="fas fa-envelope me-2"></i>Message
+                </button>
+                <button class="btn btn-outline-secondary">
+                    <i class="fas fa-ellipsis-h me-2"></i>Plus
+                </button>
+            </div>
+            
+            <div class="user-stats">
+                <div class="stat-item">
+                    <div class="stat-number">142</div>
+                    <div class="stat-label">Contacts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">Entreprises</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">38</div>
+                    <div class="stat-label">Recommandations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Projets</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Tabs -->
+        <div class="user-tabs fade-in">
+            <ul class="nav nav-tabs" id="userTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab">À propos</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="experience-tab" data-bs-toggle="tab" data-bs-target="#experience" type="button" role="tab">Expérience</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills" type="button" role="tab">Compétences</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activité</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="connections-tab" data-bs-toggle="tab" data-bs-target="#connections" type="button" role="tab">Réseau</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="userTabContent">
+                <!-- About Tab -->
+                <div class="tab-pane fade show active" id="about" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="about-section card">
+                                <div class="card-header">
+                                    <i class="fas fa-user me-2 text-primary"></i> Résumé
+                                </div>
+                                <div class="card-body">
+                                    <p>Professionnelle du marketing numérique avec plus de 10 ans d'expérience dans la création et la mise en œuvre de stratégies marketing innovantes. Spécialisée dans le marketing B2B, la transformation numérique et la gestion de marque.</p>
+                                    
+                                    <p>Passionnée par l'utilisation des données pour optimiser les performances marketing et améliorer l'expérience client. Actuellement Directrice Marketing chez Innovatech Solutions, où je dirige une équipe de 15 professionnels du marketing et gère un budget annuel de 2M€.</p>
+                                    
+                                    <p>Je suis constamment à la recherche de nouvelles opportunités pour développer des partenariats stratégiques et créer des campagnes marketing percutantes qui génèrent des résultats tangibles pour les entreprises.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-section card">
+                                <div class="card-header">
+                                    <i class="fas fa-briefcase me-2 text-primary"></i> Expérience actuelle
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex">
+                                        <div class="me-4">
+                                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%230a66c2'/%3E%3Ctext x='30' y='35' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3EIS%3C/text%3E%3C/svg%3E" alt="Innovatech" class="img-fluid">
+                                        </div>
+                                        <div>
+                                            <h5>Directrice Marketing</h5>
+                                            <p class="mb-1">Innovatech Solutions</p>
+                                            <p class="text-muted">Janvier 2019 - Présent • 4 ans 7 mois</p>
+                                            <p class="mb-0">Paris, France</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="about-card card">
+                                <div class="card-header">
+                                    <i class="fas fa-info-circle me-2 text-primary"></i> Informations
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex mb-4">
+                                        <div class="me-3">
+                                            <i class="fas fa-building fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Entreprise</h6>
+                                            <p class="mb-0">Innovatech Solutions</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex mb-4">
+                                        <div class="me-3">
+                                            <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Localisation</h6>
+                                            <p class="mb-0">Paris, France</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex mb-4">
+                                        <div class="me-3">
+                                            <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Formation</h6>
+                                            <p class="mb-0">Master en Marketing Digital</p>
+                                            <p class="mb-0">HEC Paris</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex">
+                                        <div class="me-3">
+                                            <i class="fas fa-globe fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6>Site web</h6>
+                                            <p class="mb-0">www.mariedubois.fr</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="contact-info">
+                                        <h6 class="mb-3">Coordonnées</h6>
+                                        
+                                        <div class="contact-item">
+                                            <div class="contact-icon">
+                                                <i class="fas fa-phone"></i>
+                                            </div>
+                                            <div>
+                                                <div>+33 6 12 34 56 78</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="contact-item">
+                                            <div class="contact-icon">
+                                                <i class="fas fa-envelope"></i>
+                                            </div>
+                                            <div>
+                                                <div>marie.dubois@innovatech.fr</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="contact-item">
+                                            <div class="contact-icon">
+                                                <i class="fab fa-linkedin"></i>
+                                            </div>
+                                            <div>
+                                                <div>linkedin.com/in/mariedubois</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Experience Tab -->
+                <div class="tab-pane fade" id="experience" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-briefcase me-2 text-primary"></i> Expérience professionnelle
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <!-- Experience 1 -->
+                                <div class="timeline-item fade-in">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%230a66c2'/%3E%3Ctext x='25' y='30' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3EIS%3C/text%3E%3C/svg%3E" alt="Innovatech" class="img-fluid me-3">
+                                        <div>
+                                            <h5 class="mb-0">Directrice Marketing</h5>
+                                            <p class="mb-0">Innovatech Solutions</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-date">Janvier 2019 - Présent</div>
+                                    <p>Direction d'une équipe de 15 professionnels du marketing et gestion d'un budget annuel de 2M€. Développement et mise en œuvre de stratégies marketing pour les solutions B2B. Augmentation de 45% du pipeline de ventes en 2 ans.</p>
+                                </div>
+                                
+                                <!-- Experience 2 -->
+                                <div class="timeline-item fade-in">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%235e9b6b'/%3E%3Ctext x='25' y='30' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3ETG%3C/text%3E%3C/svg%3E" alt="TechGlobal" class="img-fluid me-3">
+                                        <div>
+                                            <h5 class="mb-0">Responsable Marketing Digital</h5>
+                                            <p class="mb-0">TechGlobal</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-date">Mars 2015 - Décembre 2018</div>
+                                    <p>Gestion des campagnes marketing digitales pour le marché européen. Augmentation de 60% du trafic organique et de 35% des conversions en 2 ans. Mise en place d'une stratégie de contenu performante.</p>
+                                </div>
+                                
+                                <!-- Experience 3 -->
+                                <div class="timeline-item fade-in">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23d74345'/%3E%3Ctext x='25' y='30' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3EMC%3C/text%3E%3C/svg%3E" alt="MarketConnect" class="img-fluid me-3">
+                                        <div>
+                                            <h5 class="mb-0">Chef de Projet Marketing</h5>
+                                            <p class="mb-0">MarketConnect</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-date">Juillet 2012 - Février 2015</div>
+                                    <p>Gestion de projets marketing pour des clients B2B dans le secteur technologique. Développement de stratégies de lancement produit et d'événements sectoriels. Réussite de 12 projets avec un taux de satisfaction client de 98%.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i> Formation
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <!-- Education 1 -->
+                                <div class="timeline-item fade-in">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%230a66c2'/%3E%3Ctext x='25' y='30' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3EHC%3C/text%3E%3C/svg%3E" alt="HEC" class="img-fluid me-3">
+                                        <div>
+                                            <h5 class="mb-0">Master en Marketing Digital</h5>
+                                            <p class="mb-0">HEC Paris</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-date">2010 - 2012</div>
+                                    <p>Spécialisation en stratégies digitales et analyse de données. Mémoire de recherche sur "L'impact du marketing d'influence dans le secteur B2B".</p>
+                                </div>
+                                
+                                <!-- Education 2 -->
+                                <div class="timeline-item fade-in">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23785aa8'/%3E%3Ctext x='25' y='30' font-family='Arial' font-size='14' fill='white' text-anchor='middle'%3ESB%3C/text%3E%3C/svg%3E" alt="Sorbonne" class="img-fluid me-3">
+                                        <div>
+                                            <h5 class="mb-0">Licence en Communication</h5>
+                                            <p class="mb-0">Université Paris-Sorbonne</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-date">2007 - 2010</div>
+                                    <p>Formation générale en communication d'entreprise avec spécialisation en relations publiques. Mention Très Bien.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Skills Tab -->
+                <div class="tab-pane fade" id="skills" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card fade-in">
+                                <div class="card-header">
+                                    <i class="fas fa-star me-2 text-primary"></i> Compétences principales
+                                </div>
+                                <div class="card-body">
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Marketing stratégique B2B</span>
+                                            <span>95%</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 95%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Analyse de données</span>
+                                            <span>90%</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Gestion d'équipe</span>
+                                            <span>88%</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Stratégie de contenu</span>
+                                            <span>85%</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Marketing automation</span>
+                                            <span>80%</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 80%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6">
+                            <div class="card fade-in">
+                                <div class="card-header">
+                                    <i class="fas fa-globe me-2 text-primary"></i> Langues
+                                </div>
+                                <div class="card-body">
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Français</span>
+                                            <span>Langue maternelle</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Anglais</span>
+                                            <span>Courant</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 95%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-item">
+                                        <div class="skill-info">
+                                            <span>Espagnol</span>
+                                            <span>Intermédiaire</span>
+                                        </div>
+                                        <div class="skill-bar">
+                                            <div class="skill-progress" style="width: 70%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card fade-in mt-4">
+                                <div class="card-header">
+                                    <i class="fas fa-medal me-2 text-primary"></i> Recommandations
+                                    <span class="badge bg-primary float-end">12</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="recommendation-card">
+                                        <div class="recommender">
+                                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%23e7a33e'/%3E%3C/svg%3E" alt="Thomas Leroy" class="recommender-avatar">
+                                            <div>
+                                                <h6 class="mb-0">Thomas Leroy</h6>
+                                                <p class="mb-0 text-muted">Directeur Commercial, Innovatech</p>
+                                            </div>
+                                        </div>
+                                        <p>"Marie est une professionnelle exceptionnelle. Sa vision stratégique et sa capacité à exécuter des campagnes marketing complexes ont considérablement contribué à notre croissance."</p>
+                                        <p class="text-muted small">Septembre 2022</p>
+                                    </div>
+                                    
+                                    <div class="recommendation-card">
+                                        <div class="recommender">
+                                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%235e9b6b'/%3E%3C/svg%3E" alt="Sophie Martin" class="recommender-avatar">
+                                            <div>
+                                                <h6 class="mb-0">Sophie Martin</h6>
+                                                <p class="mb-0 text-muted">CEO, TechVision</p>
+                                            </div>
+                                        </div>
+                                        <p>"J'ai eu le plaisir de travailler avec Marie sur plusieurs projets. Sa créativité et son approche basée sur les données sont impressionnantes. Un véritable atout pour toute équipe."</p>
+                                        <p class="text-muted small">Juin 2022</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Tab -->
+                <div class="tab-pane fade" id="activity" role="tabpanel">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <i class="fas fa-rss me-2 text-primary"></i> Activité récente
+                        </div>
+                        <div class="card-body">
+                            <!-- Activity 1 -->
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-pen"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h5>Marie a publié un nouvel article</h5>
+                                    <p class="text-muted">Il y a 2 heures</p>
+                                    <div class="card mt-2">
+                                        <div class="card-body">
+                                            <h6>Les tendances du marketing B2B en 2023</h6>
+                                            <p>Découvrez comment l'IA transforme les stratégies marketing B2B et comment en tirer parti pour votre entreprise.</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span class="badge bg-light text-dark me-2">#MarketingB2B</span>
+                                                    <span class="badge bg-light text-dark">#IA</span>
+                                                </div>
+                                                <div>
+                                                    <span class="me-3"><i class="far fa-thumbs-up me-1"></i> 24</span>
+                                                    <span><i class="far fa-comment me-1"></i> 8</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity 2 -->
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h5>Marie s'est connectée avec 5 nouveaux professionnels</h5>
+                                    <p class="text-muted">Hier</p>
+                                    <div class="d-flex mt-3">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%230a66c2'/%3E%3C/svg%3E" alt="Contact" class="rounded-circle me-2" width="40" height="40">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23d74345'/%3E%3C/svg%3E" alt="Contact" class="rounded-circle me-2" width="40" height="40">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%235e9b6b'/%3E%3C/svg%3E" alt="Contact" class="rounded-circle me-2" width="40" height="40">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e7a33e'/%3E%3C/svg%3E" alt="Contact" class="rounded-circle me-2" width="40" height="40">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23785aa8'/%3E%3C/svg%3E" alt="Contact" class="rounded-circle" width="40" height="40">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Activity 3 -->
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h5>Marie a aimé une publication de TechVision</h5>
+                                    <p class="text-muted">Il y a 2 jours</p>
+                                    <div class="card mt-2">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23e7a33e'/%3E%3Ctext x='20' y='25' font-family='Arial' font-size='12' fill='white' text-anchor='middle'%3ETV%3C/text%3E%3C/svg%3E" alt="TechVision" class="me-2">
+                                                <div>
+                                                    <h6 class="mb-0">TechVision</h6>
+                                                    <p class="mb-0 text-muted">Publié il y a 2 jours</p>
+                                                </div>
+                                            </div>
+                                            <p>Découvrez notre nouveau rapport sur l'impact de l'IA dans le secteur manufacturier. Téléchargement gratuit disponible !</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connections Tab -->
+                <div class="tab-pane fade" id="connections" role="tabpanel">
+                    <div class="card fade-in">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-user-friends me-2 text-primary"></i>
+                                <span>Réseau de Marie (142 contacts)</span>
+                            </div>
+                            <div class="input-group" style="width: 250px;">
+                                <input type="text" class="form-control" placeholder="Rechercher un contact...">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Connection 1 -->
+                            <div class="connection-item fade-in">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%230a66c2'/%3E%3C/svg%3E" alt="Thomas Bernard" class="connection-avatar">
+                                <div>
+                                    <h5 class="mb-1">Thomas Bernard</h5>
+                                    <p class="mb-0 text-muted">CEO chez Innovate Group</p>
+                                    <p class="mb-0 small">12 contacts en commun</p>
+                                </div>
+                                <div class="connection-actions">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection 2 -->
+                            <div class="connection-item fade-in">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23e7a33e'/%3E%3C/svg%3E" alt="Sophie Martin" class="connection-avatar">
+                                <div>
+                                    <h5 class="mb-1">Sophie Martin</h5>
+                                    <p class="mb-0 text-muted">Directrice Marketing chez TechSolutions</p>
+                                    <p class="mb-0 small">8 contacts en commun</p>
+                                </div>
+                                <div class="connection-actions">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection 3 -->
+                            <div class="connection-item fade-in">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%235e9b6b'/%3E%3C/svg%3E" alt="Émilie Dubois" class="connection-avatar">
+                                <div>
+                                    <h5 class="mb-1">Émilie Dubois</h5>
+                                    <p class="mb-0 text-muted">Responsable Partenariats chez GlobalConnect</p>
+                                    <p class="mb-0 small">15 contacts en commun</p>
+                                </div>
+                                <div class="connection-actions">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection 4 -->
+                            <div class="connection-item fade-in">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23d74345'/%3E%3C/svg%3E" alt="Jean Dupont" class="connection-avatar">
+                                <div>
+                                    <h5 class="mb-1">Jean Dupont</h5>
+                                    <p class="mb-0 text-muted">CTO chez DigitalFuture</p>
+                                    <p class="mb-0 small">7 contacts en commun</p>
+                                </div>
+                                <div class="connection-actions">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection 5 -->
+                            <div class="connection-item fade-in">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='30' cy='30' r='30' fill='%23785aa8'/%3E%3C/svg%3E" alt="Laura Petit" class="connection-avatar">
+                                <div>
+                                    <h5 class="mb-1">Laura Petit</h5>
+                                    <p class="mb-0 text-muted">Directrice chez FinTechLab</p>
+                                    <p class="mb-0 small">10 contacts en commun</p>
+                                </div>
+                                <div class="connection-actions">
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-envelope me-1"></i> Message
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5><i class="fas fa-handshake me-2"></i>Connect'Entreprises</h5>
+                    <p>La plateforme de réseau social B2B nouvelle génération pour développer votre entreprise et créer des partenariats stratégiques.</p>
+                    <div class="d-flex mt-4">
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Navigation</h5>
+                    <a href="#">Accueil</a>
+                    <a href="#">Fonctionnalités</a>
+                    <a href="#">Tarifs</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Légal</h5>
+                    <a href="#">CGU</a>
+                    <a href="#">Confidentialité</a>
+                    <a href="#">Cookies</a>
+                    <a href="#">Mentions légales</a>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h5>Newsletter</h5>
+                    <p>Abonnez-vous pour recevoir nos dernières actualités.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Votre email">
+                        <button class="btn btn-primary" type="button">S'inscrire</button>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4">
+            <div class="text-center">
+                <p>&copy; 2023 Connect'Entreprises. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Animation for elements
+            $('.fade-in').each(function(i) {
+                $(this).delay(100 * i).animate({opacity: 1}, 300);
+            });
+            
+            // Tab activation
+            $('.nav-tabs .nav-link').click(function() {
+                $('.nav-link').removeClass('active');
+                $(this).addClass('active');
+                $('.tab-pane').removeClass('show active');
+                $($(this).attr('data-bs-target')).addClass('show active');
+            });
+            
+            // Skill bars animation
+            $('.skill-progress').each(function() {
+                var width = $(this).attr('style');
+                $(this).css('width', '0');
+                $(this).animate({
+                    width: width
+                }, 1500);
+            });
+            
+            // Connection item hover effect
+            $('.connection-item').hover(function() {
+                $(this).css('transform', 'translateY(-3px)');
+                $(this).css('box-shadow', '0 5px 15px rgba(0,0,0,0.1)');
+            }, function() {
+                $(this).css('transform', 'translateY(0)');
+                $(this).css('box-shadow', '0 3px 10px rgba(0,0,0,0.05)');
+            });
+        });
+    </script>
+</body>
+</html>

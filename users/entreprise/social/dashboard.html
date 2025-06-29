@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Connect'Entreprises</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0a66c2;
+            --secondary: #378fe9;
+            --dark: #1d2226;
+            --light: #f3f2ef;
+            --gray: #eef3f8;
+            --text-dark: #222222;
+            --text-light: #666666;
+            --success: #5e9b6b;
+            --warning: #e7a33e;
+            --danger: #d74345;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light);
+            color: var(--text-dark);
+            padding-top: 70px;
+        }
+        
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-logo {
+            padding: 25px 20px 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+            border-radius: 0 30px 30px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(10, 102, 194, 0.1);
+            color: var(--primary);
+        }
+        
+        .nav-link i {
+            width: 24px;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Topbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            z-index: 1000;
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 30px;
+        }
+        
+        .search-bar .form-control {
+            background-color: var(--gray);
+            border-radius: 30px;
+            border: none;
+            padding: 10px 20px;
+        }
+        
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-btn, .message-btn {
+            position: relative;
+            margin: 0 15px;
+            color: var(--text-light);
+            font-size: 20px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--primary);
+        }
+        
+        /* Cards */
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Activity Feed */
+        .post-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .post-info {
+            flex: 1;
+        }
+        
+        .post-company {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+        
+        .post-time {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .post-content {
+            padding: 20px;
+        }
+        
+        .post-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .post-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .post-stats {
+            display: flex;
+            padding: 0 20px;
+            color: var(--text-light);
+            font-size: 14px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .post-actions {
+            display: flex;
+            padding: 10px 20px;
+        }
+        
+        .post-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: var(--text-light);
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .post-action:hover {
+            background-color: var(--gray);
+            color: var(--primary);
+        }
+        
+        .post-action i {
+            margin-right: 8px;
+        }
+        
+        /* Contacts */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .contact-item:hover {
+            background-color: var(--gray);
+        }
+        
+        .contact-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .contact-info {
+            flex: 1;
+        }
+        
+        .contact-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .contact-company {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .contact-actions {
+            display: flex;
+        }
+        
+        .contact-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray);
+            color: var(--text-light);
+            margin-left: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .contact-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-title {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+            }
+        }
+        
+        .menu-toggle {
+            display: none;
+            margin-right: 15px;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            <i class="fas fa-handshake text-primary"></i>
+            <span class="fw-bold ms-2">Connect'Entreprises</span>
+        </div>
+        <div class="search-bar">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Rechercher des entreprises, contacts, publications...">
+                <span class="input-group-text bg-transparent border-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <a href="#" class="notification-btn">
+                <i class="far fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </a>
+            <a href="#" class="message-btn">
+                <i class="far fa-envelope"></i>
+                <span class="notification-badge">5</span>
+            </a>
+            <div class="user-profile">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23378fe9'/%3E%3C/svg%3E" alt="User" class="user-avatar">
+                <div>
+                    <div class="fw-bold">Marie Dubois</div>
+                    <div class="small text-muted">Innovatech</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <h5 class="fw-bold text-primary">Tableau de bord</h5>
+            </div>
+            <div class="sidebar-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-home"></i>
+                            <span>Flux d'actualités</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-users"></i>
+                            <span>Mon réseau</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-comments"></i>
+                            <span>Messagerie</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Entreprises</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Événements</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytiques</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-5 px-3">
+                    <h6 class="text-uppercase text-muted small mb-3">Mon entreprise</h6>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-light rounded p-2 me-3">
+                            <i class="fas fa-building text-primary"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">Innovatech Solutions</div>
+                            <div class="small text-muted">250 collaborateurs</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100">
+                        <i class="fas fa-pencil-alt me-2"></i>Éditer le profil
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Left Column (Feed) -->
+                    <div class="col-lg-7">
+                        <!-- Create Post -->
+                        <div class="card fade-in">
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23378fe9'/%3E%3C/svg%3E" alt="User" class="post-avatar">
+                                    <input type="text" class="form-control ms-2" placeholder="Partagez une actualité avec votre réseau...">
+                                </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <div class="d-flex">
+                                        <button class="btn btn-light me-2">
+                                            <i class="far fa-image text-success"></i> Photo
+                                        </button>
+                                        <button class="btn btn-light me-2">
+                                            <i class="fas fa-video text-danger"></i> Vidéo
+                                        </button>
+                                        <button class="btn btn-light">
+                                            <i class="far fa-calendar-alt text-primary"></i> Événement
+                                        </button>
+                                    </div>
+                                    <button class="btn btn-primary">Publier</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity Feed -->
+                        <div class="card fade-in">
+                            <div class="card-header d-flex align-items-center">
+                                <i class="fas fa-newspaper me-2 text-primary"></i>
+                                <span>Actualités de votre réseau</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- Post 1 -->
+                                <div class="post-card">
+                                    <div class="post-header">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e7a33e'/%3E%3C/svg%3E" alt="User" class="post-avatar">
+                                        <div class="post-info">
+                                            <div class="post-company">TechVision</div>
+                                            <div class="post-time">Publié il y a 2 heures</div>
+                                        </div>
+                                        <i class="fas fa-ellipsis-h text-muted"></i>
+                                    </div>
+                                    <div class="post-content">
+                                        <p class="post-text">Nous sommes ravis d'annoncer le lancement de notre nouvelle plateforme IA pour l'optimisation des chaînes d'approvisionnement. Cette solution révolutionnaire permet de réduire les coûts logistiques jusqu'à 30% tout en améliorant la traçabilité.</p>
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300' viewBox='0 0 600 300'%3E%3Crect width='600' height='300' fill='%23eef3f8'/%3E%3Crect x='50' y='50' width='500' height='200' rx='10' fill='%230a66c2' opacity='0.3'/%3E%3Ctext x='300' y='150' font-family='Arial' font-size='24' fill='%230a66c2' text-anchor='middle'%3EImage de la publication%3C/text%3E%3C/svg%3E" alt="Post" class="post-image">
+                                        <div class="d-flex">
+                                            <span class="badge bg-light text-dark me-2">#IA</span>
+                                            <span class="badge bg-light text-dark me-2">#Logistique</span>
+                                            <span class="badge bg-light text-dark">#Innovation</span>
+                                        </div>
+                                    </div>
+                                    <div class="post-stats">
+                                        <div class="me-3"><i class="fas fa-thumbs-up me-1 text-primary"></i> 42</div>
+                                        <div><i class="fas fa-comment me-1 text-muted"></i> 8 commentaires</div>
+                                    </div>
+                                    <div class="post-actions">
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-thumbs-up"></i> J'aime
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-comment"></i> Commenter
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="fas fa-share"></i> Partager
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Post 2 -->
+                                <div class="post-card">
+                                    <div class="post-header">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%235e9b6b'/%3E%3C/svg%3E" alt="User" class="post-avatar">
+                                        <div class="post-info">
+                                            <div class="post-company">GreenTech Solutions</div>
+                                            <div class="post-time">Publié il y a 5 heures</div>
+                                        </div>
+                                        <i class="fas fa-ellipsis-h text-muted"></i>
+                                    </div>
+                                    <div class="post-content">
+                                        <p class="post-text">Nous recherchons des partenaires pour notre projet de développement durable en Afrique. Si votre entreprise est spécialisée dans les énergies renouvelables ou l'agriculture durable, contactez-nous pour discuter de collaborations potentielles.</p>
+                                        <div class="d-flex">
+                                            <span class="badge bg-light text-dark me-2">#DéveloppementDurable</span>
+                                            <span class="badge bg-light text-dark me-2">#Afrique</span>
+                                            <span class="badge bg-light text-dark">#Partenariat</span>
+                                        </div>
+                                    </div>
+                                    <div class="post-stats">
+                                        <div class="me-3"><i class="fas fa-thumbs-up me-1 text-primary"></i> 28</div>
+                                        <div><i class="fas fa-comment me-1 text-muted"></i> 5 commentaires</div>
+                                    </div>
+                                    <div class="post-actions">
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-thumbs-up"></i> J'aime
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-comment"></i> Commenter
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="fas fa-share"></i> Partager
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Post 3 -->
+                                <div class="post-card">
+                                    <div class="post-header">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23d74345'/%3E%3C/svg%3E" alt="User" class="post-avatar">
+                                        <div class="post-info">
+                                            <div class="post-company">Marie Dubois</div>
+                                            <div class="post-time">Publié il y a 1 jour</div>
+                                        </div>
+                                        <i class="fas fa-ellipsis-h text-muted"></i>
+                                    </div>
+                                    <div class="post-content">
+                                        <p class="post-text">Je suis ravie d'annoncer que notre entreprise a remporté le prix de l'innovation digitale lors du salon TechExpo 2023. Merci à toute l'équipe pour son travail exceptionnel et à nos partenaires pour leur soutien continu.</p>
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300' viewBox='0 0 600 300'%3E%3Crect width='600' height='300' fill='%23eef3f8'/%3E%3Crect x='50' y='50' width='500' height='200' rx='10' fill='%23d74345' opacity='0.3'/%3E%3Ctext x='300' y='150' font-family='Arial' font-size='24' fill='%23d74345' text-anchor='middle'%3EPhoto du prix%3C/text%3E%3C/svg%3E" alt="Post" class="post-image">
+                                        <div class="d-flex">
+                                            <span class="badge bg-light text-dark me-2">#Innovation</span>
+                                            <span class="badge bg-light text-dark me-2">#Prix</span>
+                                            <span class="badge bg-light text-dark">#Équipe</span>
+                                        </div>
+                                    </div>
+                                    <div class="post-stats">
+                                        <div class="me-3"><i class="fas fa-thumbs-up me-1 text-primary"></i> 65</div>
+                                        <div><i class="fas fa-comment me-1 text-muted"></i> 12 commentaires</div>
+                                    </div>
+                                    <div class="post-actions">
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-thumbs-up"></i> J'aime
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="far fa-comment"></i> Commenter
+                                        </a>
+                                        <a href="#" class="post-action">
+                                            <i class="fas fa-share"></i> Partager
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column (Contacts & Stats) -->
+                    <div class="col-lg-5">
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="stat-card fade-in">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="stat-number">142</div>
+                                    <div class="stat-title">Contacts professionnels</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="stat-card fade-in" style="background: linear-gradient(135deg, #5e9b6b 0%, #7dbf8c 100%);">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="stat-number">24</div>
+                                    <div class="stat-title">Entreprises connectées</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="stat-card fade-in" style="background: linear-gradient(135deg, #e7a33e 0%, #f0c078 100%);">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-calendar-check"></i>
+                                    </div>
+                                    <div class="stat-number">7</div>
+                                    <div class="stat-title">Événements à venir</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="stat-card fade-in" style="background: linear-gradient(135deg, #d74345 0%, #e67a7c 100%);">
+                                    <div class="stat-icon">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <div class="stat-number">12</div>
+                                    <div class="stat-title">Notifications</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- My Contacts -->
+                        <div class="card fade-in">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-user-friends me-2 text-primary"></i>
+                                    <span>Mes contacts</span>
+                                </div>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Voir tous</a>
+                            </div>
+                            <div class="card-body p-0">
+                                <!-- Contact 1 -->
+                                <div class="contact-item">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%230a66c2'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="contact-info">
+                                        <div class="contact-name">Thomas Bernard</div>
+                                        <div class="contact-company">CEO @ Innovate Group</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contact 2 -->
+                                <div class="contact-item">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%23e7a33e'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="contact-info">
+                                        <div class="contact-name">Sophie Martin</div>
+                                        <div class="contact-company">Marketing @ TechSolutions</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contact 3 -->
+                                <div class="contact-item">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%235e9b6b'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="contact-info">
+                                        <div class="contact-name">Émilie Dubois</div>
+                                        <div class="contact-company">Partenariats @ GlobalConnect</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contact 4 -->
+                                <div class="contact-item">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%23d74345'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="contact-info">
+                                        <div class="contact-name">Jean Dupont</div>
+                                        <div class="contact-company">CTO @ DigitalFuture</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Contact 5 -->
+                                <div class="contact-item">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 45 45'%3E%3Ccircle cx='22.5' cy='22.5' r='22.5' fill='%23785aa8'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="contact-info">
+                                        <div class="contact-name">Laura Petit</div>
+                                        <div class="contact-company">Directrice @ FinTechLab</div>
+                                    </div>
+                                    <div class="contact-actions">
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                        <a href="#" class="contact-btn">
+                                            <i class="fas fa-user-plus"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Suggestions -->
+                        <div class="card fade-in">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-user-plus me-2 text-primary"></i>
+                                    <span>Suggestions de contacts</span>
+                                </div>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Voir plus</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex mb-3">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%230a66c2'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="fw-bold">Marc Lefevre</div>
+                                        <div class="small text-muted">Développement @ EcoTech</div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-outline-primary me-2">Connecter</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Ignorer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex mb-3">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%235e9b6b'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="fw-bold">Nathalie Rousseau</div>
+                                        <div class="small text-muted">RH @ TechTalent</div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-outline-primary me-2">Connecter</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Ignorer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23e7a33e'/%3E%3C/svg%3E" alt="Contact" class="contact-avatar">
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="fw-bold">Pierre Moreau</div>
+                                        <div class="small text-muted">Directeur @ LogiSolutions</div>
+                                        <div class="mt-2">
+                                            <button class="btn btn-sm btn-outline-primary me-2">Connecter</button>
+                                            <button class="btn btn-sm btn-outline-secondary">Ignorer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Toggle sidebar on mobile
+            $('.menu-toggle').click(function() {
+                $('.sidebar').toggleClass('active');
+            });
+            
+            // Animation for cards
+            $('.fade-in').each(function(i) {
+                $(this).delay(100 * i).animate({opacity: 1}, 300);
+            });
+            
+            // Post like functionality
+            $('.post-action:has(.fa-thumbs-up)').click(function(e) {
+                e.preventDefault();
+                $(this).toggleClass('text-primary');
+                $(this).find('i').toggleClass('far fas');
+            });
+            
+            // Contact actions
+            $('.contact-btn').hover(function() {
+                $(this).tooltip({
+                    title: $(this).find('i').hasClass('fa-comment') ? "Envoyer un message" : "Ajouter aux contacts",
+                    placement: 'top',
+                    trigger: 'hover'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
