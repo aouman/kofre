@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Factures & Clients</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-bg: #f8f9fa;
+            --dark-bg: #1a2530;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .invoice-header, .client-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .invoice-logo {
+            max-height: 100px;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+        
+        .items-table td {
+            vertical-align: middle;
+        }
+        
+        .invoice-totals, .client-info-card {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            padding-top: 20px;
+        }
+        
+        .btn-add-item, .btn-add-client {
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .delete-item, .delete-client {
+            color: var(--danger-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .delete-item:hover, .delete-client:hover {
+            transform: scale(1.2);
+        }
+        
+        .signature-canvas {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: white;
+            cursor: crosshair;
+            margin-top: 10px;
+        }
+        
+        .signature-controls {
+            margin-top: 10px;
+        }
+        
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            border: none;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .invoice-preview, .client-details {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tva-control {
+            max-width: 120px;
+        }
+        
+        .signature-preview {
+            max-width: 250px;
+            margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 45px;
+            font-size: 0.85rem;
+            text-align: center;
+            width: 100px;
+            left: -30px;
+            color: #777;
+            font-weight: 500;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            height: 3px;
+            width: calc(100% - 40px);
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .step-1 .step-label { left: 0; }
+        .step-2 .step-label { left: 33%; transform: translateX(-50%); }
+        .step-3 .step-label { right: 0; }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-bg));
+            color: white;
+            border-radius: 0 0 30px 30px;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .app-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .app-logo span {
+            color: var(--secondary-color);
+        }
+        
+        .feature-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .feature-card .card-body {
+            flex-grow: 1;
+        }
+        
+        .invoice-card, .client-card {
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s;
+        }
+        
+        .invoice-card:hover, .client-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .invoice-card.paid {
+            border-left-color: var(--success-color);
+        }
+        
+        .invoice-card.pending {
+            border-left-color: var(--warning-color);
+        }
+        
+        .invoice-card.overdue {
+            border-left-color: var(--danger-color);
+        }
+        
+        .client-card {
+            border-left-color: #9b59b6;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #777;
+        }
+        
+        .invoice-list-header, .client-list-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .invoice-amount, .client-company {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+        
+        .stat-label {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons .btn {
+            margin: 0 5px;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .client-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="app-logo mb-3">Facture<span>Pro</span></div>
+                    <h1>Gestion complète de vos factures et clients</h1>
+                    <p class="lead">Créez, gérez et signez vos factures en ligne</p>
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+                            <i class="fas fa-file-invoice me-2"></i>Créer une facture
+                        </button>
+                        <button class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#manageClientsModal">
+                            <i class="fas fa-users me-2"></i>Gérer les clients
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1604594849809-dfedbc827105?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Facturation" class="img-fluid rounded shadow" style="max-height: 300px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <!-- Navigation par onglets -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab">
+                    <i class="fas fa-file-invoice me-2"></i>Factures
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Clients
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Contenu des onglets -->
+        <div class="tab-content" id="mainTabsContent">
+            <!-- Onglet Factures -->
+            <div class="tab-pane fade show active" id="invoices" role="tabpanel">
+                <!-- Statistiques -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalInvoices">12</div>
+                            <div class="stat-label">Factures</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">€<span id="totalAmount">8,450</span></div>
+                            <div class="stat-label">Montant total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="paidInvoices">8</div>
+                            <div class="stat-label">Payées</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="pendingInvoices">4</div>
+                            <div class="stat-label">En attente</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- En-tête de la liste -->
+                <div class="invoice-list-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h2 class="mb-0">Liste des Factures</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control ps-4" id="searchInvoices" placeholder="Rechercher...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des factures -->
+                <div class="row" id="invoicesList">
+                    <!-- Les factures seront chargées ici dynamiquement -->
+                </div>
+            </div>
+            
+            <!-- Onglet Clients -->
+            <div class="tab-pane fade" id="clients" role="tabpanel">
+                <!-- Statistiques clients -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalClients">6</div>
+                            <div class="stat-label">Clients</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="activeClients">5</div>
+                            <div class="stat-label">Actifs</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="clientInvoices">24</div>
+                            <div class="stat-label">Factures totales</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">€<span id="clientRevenue">18,450</span></div>
+                            <div class="stat-label">Revenus clients</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- En-tête de la liste des clients -->
+                <div class="client-list-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h2 class="mb-0">Liste des Clients</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-success" id="addClientBtn">
+                            <i class="fas fa-plus me-2"></i>Ajouter un client
+                        </button>
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control ps-4" id="searchClients" placeholder="Rechercher...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des clients -->
+                <div class="row" id="clientsList">
+                    <!-- Les clients seront chargés ici dynamiquement -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Création Facture -->
+    <div class="modal fade" id="createInvoiceModal" tabindex="-1" aria-hidden="true">
+        <!-- Le contenu reste le même que dans la version précédente -->
+        <!-- Pour la concision, je ne répète pas tout le contenu ici -->
+    </div>
+
+    <!-- Modal Aperçu Facture -->
+    <div class="modal fade" id="previewInvoiceModal" tabindex="-1" aria-hidden="true">
+        <!-- Le contenu reste le même que dans la version précédente -->
+    </div>
+
+    <!-- Modal Gestion Clients -->
+    <div class="modal fade" id="manageClientsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Gestion des Clients</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-end mb-4">
+                        <!--button type="button" class="btn btn-success" id="addClientBtn">
+                            <i class="fas fa-plus me-2"></i>Ajouter un client
+                        </button-->
+                    </div>
+                    
+                    <div id="clientsManagementContent">
+                        <!-- Liste des clients pour gestion -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Société</th>
+                                        <th>Téléphone</th>
+                                        <th>Email</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientsManagementList">
+                                    <!-- Les clients seront chargés ici dynamiquement -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Formulaire d'ajout/modification de client -->
+                    <div id="clientFormContainer" class="d-none">
+                        <h5 class="mb-4" id="clientFormTitle">Ajouter un nouveau client</h5>
+                        <form id="clientForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nom complet</label>
+                                    <input type="text" class="form-control" id="clientName" placeholder="Prénom Nom" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Société</label>
+                                    <input type="text" class="form-control" id="clientCompany" placeholder="Nom de l'entreprise">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="clientEmail" placeholder="email@exemple.com">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="clientPhone" placeholder="01 23 45 67 89">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Adresse</label>
+                                    <input type="text" class="form-control" id="clientAddress" placeholder="Adresse">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Code Postal</label>
+                                    <input type="text" class="form-control" id="clientZip" placeholder="Code postal">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Ville</label>
+                                    <input type="text" class="form-control" id="clientCity" placeholder="Ville">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" id="clientNotes" rows="3" placeholder="Informations supplémentaires"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="button" class="btn btn-secondary me-2" id="cancelClientForm">
+                                    Annuler
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // Variables globales
+        let currentStep = 1;
+        let signatureData = null;
+        let invoices = [];
+        let clients = [];
+        let currentClientId = null; // Pour l'édition de client
+        
+        // Initialiser la date d'échéance
+        const today = new Date();
+        const dueDate = new Date();
+        dueDate.setDate(today.getDate() + 30);
+        $("#dueDate").val(dueDate.toISOString().split('T')[0]);
+        $("input[type='date'][readonly]").val(today.toISOString().split('T')[0]);
+        
+        // Charger les données au démarrage
+        loadData();
+        
+        // Navigation entre les étapes (factures)
+        function updateStepNavigation() {
+            // Mettre à jour l'indicateur d'étape
+            $('.step').removeClass('active completed');
+            $(`.step-${currentStep}`).addClass('active');
+            
+            for (let i = 1; i < currentStep; i++) {
+                $(`.step-${i}`).addClass('completed');
+            }
+            
+            // Afficher/masquer le contenu des étapes
+            $('.step-content').addClass('d-none');
+            $(`.step-${currentStep}-content`).removeClass('d-none');
+            
+            // Gérer les boutons de navigation
+            if (currentStep === 1) {
+                $('#prevStepBtn').hide();
+                $('#nextStepBtn').show();
+                $('#generateInvoiceBtn').hide();
+            } else if (currentStep === 2) {
+                $('#prevStepBtn').show();
+                $('#nextStepBtn').show();
+                $('#generateInvoiceBtn').hide();
+            } else if (currentStep === 3) {
+                $('#prevStepBtn').show();
+                $('#nextStepBtn').hide();
+                $('#generateInvoiceBtn').show();
+                
+                // Mettre à jour le récapitulatif
+                updateSummary();
+            }
+        }
+        
+        // Mettre à jour le récapitulatif (factures)
+        function updateSummary() {
+            $('#summaryClient').text($("#clientSelect option:selected").text());
+            $('#summarySubtotal').text($("#subtotal").text());
+            $('#summaryTax').text($("#tax").text());
+            $('#summaryTotal').text($("#total").text());
+            
+            // Mettre à jour les articles
+            let itemsHtml = '';
+            $("#itemsTableBody tr").each(function() {
+                const desc = $(this).find(".item-description").val() || 'Article';
+                const qty = $(this).find(".item-quantity").val() || 1;
+                const price = parseFloat($(this).find(".item-price").val()) || 0;
+                const total = (qty * price).toFixed(2);
+                
+                itemsHtml += `
+                    <tr>
+                        <td>${desc}</td>
+                        <td class="text-end">${qty}</td>
+                        <td class="text-end">€${price.toFixed(2)}</td>
+                        <td class="text-end">€${total}</td>
+                    </tr>
+                `;
+            });
+            
+            $("#summaryItems").html(itemsHtml);
+        }
+        
+        // Événements de navigation (factures)
+        $('#nextStepBtn').click(function() {
+            if (currentStep < 3) {
+                currentStep++;
+                updateStepNavigation();
+            }
+        });
+        
+        $('#prevStepBtn').click(function() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepNavigation();
+            }
+        });
+        
+        // Ajouter un nouvel article (factures)
+        $("#addItemBtn").click(function() {
+            const newRow = `
+                <tr>
+                    <td><input type="text" class="form-control item-description" placeholder="Description de l'article"></td>
+                    <td><input type="number" class="form-control item-quantity" value="1" min="1"></td>
+                    <td>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control item-price" value="0" min="0" step="0.01">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="text" class="form-control item-total" value="0.00" readonly>
+                        </div>
+                    </td>
+                    <td><i class="fas fa-trash delete-item"></i></td>
+                </tr>`;
+            $("#itemsTableBody").append(newRow);
+        });
+
+        // Supprimer un article (factures)
+        $(document).on("click", ".delete-item", function() {
+            if($("#itemsTableBody tr").length > 1) {
+                $(this).closest("tr").remove();
+                calculateTotals();
+            }
+        });
+
+        // Calcul des totaux (factures)
+        function calculateTotals() {
+            let subtotal = 0;
+            
+            $("#itemsTableBody tr").each(function() {
+                const qty = parseFloat($(this).find(".item-quantity").val()) || 0;
+                const price = parseFloat($(this).find(".item-price").val()) || 0;
+                const total = qty * price;
+                
+                subtotal += total;
+                $(this).find(".item-total").val(total.toFixed(2));
+            });
+            
+            const taxRate = parseFloat($("#taxRate").val()) || 0;
+            const tax = subtotal * (taxRate / 100);
+            const total = subtotal + tax;
+            
+            $("#subtotal").text("€" + subtotal.toFixed(2));
+            $("#tax").text("€" + tax.toFixed(2));
+            $("#total").text("€" + total.toFixed(2));
+            $("#taxRateLabel").text(taxRate);
+            
+            return { subtotal, tax, total, taxRate };
+        }
+
+        // Écouteurs de modification (factures)
+        $(document).on("input", ".item-quantity, .item-price", calculateTotals);
+        $("#taxRate").on("input", calculateTotals);
+
+        // Générer la facture
+        $("#generateInvoiceBtn").click(function() {
+            const clientId = $("#clientSelect").val();
+            const client = clients.find(c => c.id == clientId);
+            
+            if (!client) {
+                alert("Veuillez sélectionner un client valide");
+                return;
+            }
+            
+            const invoiceData = {
+                id: Date.now(),
+                clientId: clientId,
+                client: client.name,
+                clientCompany: client.company,
+                dueDate: $("#dueDate").val(),
+                items: [],
+                totals: calculateTotals(),
+                invoiceNumber: "INV-" + Math.floor(1000 + Math.random() * 9000),
+                issueDate: new Date().toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                status: 'pending'
+            };
+            
+            $("#itemsTableBody tr").each(function() {
+                invoiceData.items.push({
+                    description: $(this).find(".item-description").val() || "Article",
+                    quantity: $(this).find(".item-quantity").val() || 1,
+                    price: $(this).find(".item-price").val() || 0,
+                    total: $(this).find(".item-total").val() || "0.00"
+                });
+            });
+            
+            // Ajouter la facture à la liste
+            invoices.push(invoiceData);
+            saveData();
+            renderInvoices();
+            
+            generateInvoicePreview(invoiceData);
+            $("#createInvoiceModal").modal("hide");
+            $("#previewInvoiceModal").modal("show");
+        });
+
+        // Générer l'aperçu HTML de la facture
+        function generateInvoicePreview(data) {
+            const itemsHtml = data.items.map(item => `
+                <tr>
+                    <td>${item.description}</td>
+                    <td class="text-end">${item.quantity}</td>
+                    <td class="text-end">€${parseFloat(item.price).toFixed(2)}</td>
+                    <td class="text-end">€${item.total}</td>
+                </tr>
+            `).join('');
+            
+            const invoiceHtml = `
+                <div class="invoice-container p-4">
+                    <div class="invoice-header p-4 mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h1 class="display-5">FACTURE</h1>
+                                <p class="mb-1"><strong>N°:</strong> ${data.invoiceNumber}</p>
+                                <p class="mb-1"><strong>Date:</strong> ${data.issueDate}</p>
+                                <p class="mb-0"><strong>Échéance:</strong> ${data.dueDate}</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex flex-column align-items-end">
+                                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="invoice-logo mb-2">
+                                    <p class="mb-0 fw-bold">Entreprise Facturée</p>
+                                    <p class="mb-0">123 Rue du Commerce</p>
+                                    <p class="mb-0">75000 Paris</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Client</h5>
+                            <p class="mb-1 fw-bold">${data.clientCompany || data.client}</p>
+                            <p class="mb-0">${data.client}</p>
+                            <p class="mb-0">Adresse Client</p>
+                            <p class="mb-0">CP Ville</p>
+                        </div>
+                    </div>
+                    
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Quantité</th>
+                                <th class="text-end">Prix Unitaire</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+                    
+                    <div class="row justify-content-end">
+                        <div class="col-md-4">
+                            <div class="invoice-totals p-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Sous-total:</span>
+                                    <span>€${data.totals.subtotal.toFixed(2)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <span>TVA (${data.totals.taxRate}%):</span>
+                                    <span>€${data.totals.tax.toFixed(2)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2 fw-bold fs-5">
+                                    <span>Total:</span>
+                                    <span>€${data.totals.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signature-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Signature du client</h5>
+                                <div id="signatureCanvasContainer">
+                                    <canvas id="signatureCanvas" width="400" height="150" class="signature-canvas"></canvas>
+                                    <div class="signature-controls">
+                                        <button id="clearSignatureBtn" class="btn btn-sm btn-outline-danger me-2">
+                                            <i class="fas fa-eraser me-1"></i>Effacer
+                                        </button>
+                                        <button id="saveSignatureBtn" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check me-1"></i>Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Signature de l'émetteur</h5>
+                                <div class="d-flex align-items-center" style="height: 150px; background-color: #f8f9fa; border-radius: 8px; padding: 15px;">
+                                    <div class="text-center w-100">
+                                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="rounded-circle mb-2" width="60">
+                                        <p class="mb-0 fw-bold">Jean Dupont</p>
+                                        <p class="mb-0 text-muted">Directeur</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5 pt-3 border-top text-center text-muted">
+                        <p class="mb-0">Merci pour votre confiance !</p>
+                        <p class="mb-0">Entreprise Facturée - SIRET: 123 456 789 00010 - TVA Intra: FR00123456789</p>
+                    </div>
+                </div>
+            `;
+            
+            $("#invoicePreview").html(invoiceHtml);
+            initSignaturePad();
+        }
+
+        // Initialiser le pad de signature
+        function initSignaturePad() {
+            const canvas = document.getElementById("signatureCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            // Réinitialiser le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Variables pour le dessin
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // Fonctions de dessin
+            function startDrawing(e) {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            // Événements
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Effacer la signature
+            $("#clearSignatureBtn").click(function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+            
+            // Sauvegarder la signature
+            $("#saveSignatureBtn").click(function() {
+                signatureData = canvas.toDataURL();
+                $(this).html('<i class="fas fa-check me-1"></i>Signature enregistrée').addClass('disabled');
+                $("#clearSignatureBtn").prop('disabled', true);
+                canvas.style.border = "2px solid #27ae60";
+            });
+        }
+
+        // Imprimer la facture
+        $("#printInvoiceBtn").click(function() {
+            const printContent = $("#invoicePreview").html();
+            const originalContent = $("body").html();
+            
+            $("body").html(printContent);
+            window.print();
+            $("body").html(originalContent);
+            $("#previewInvoiceModal").modal("show");
+        });
+
+        // Télécharger PDF (simulé)
+        $("#downloadPdfBtn").click(function() {
+            alert("Fonction PDF non implémentée dans cet exemple. En production, utiliser une librairie comme jsPDF ou window.print()");
+        });
+        
+        // Sauvegarder toutes les données dans localStorage
+        function saveData() {
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            localStorage.setItem('clients', JSON.stringify(clients));
+            updateStats();
+        }
+        
+        // Charger toutes les données depuis localStorage
+        function loadData() {
+            const savedInvoices = localStorage.getItem('invoices');
+            const savedClients = localStorage.getItem('clients');
+            
+            if (savedInvoices) {
+                invoices = JSON.parse(savedInvoices);
+            }
+            
+            if (savedClients) {
+                clients = JSON.parse(savedClients);
+            } else {
+                // Ajouter des clients par défaut
+                clients = [
+                    {id: 1, name: "Pierre Dupont", company: "Société ABC", email: "pierre@abc.com", phone: "01 23 45 67 89", address: "123 Rue des Entrepreneurs", zip: "75000", city: "Paris"},
+                    {id: 2, name: "Marie Martin", company: "Entreprise XYZ", email: "marie@xyz.com", phone: "06 12 34 56 78", address: "456 Avenue du Commerce", zip: "69000", city: "Lyon"},
+                    {id: 3, name: "Jean Bernard", company: "", email: "jean@mail.com", phone: "07 89 01 23 45", address: "789 Boulevard des Affaires", zip: "13000", city: "Marseille"}
+                ];
+                saveData();
+            }
+            
+            renderInvoices();
+            renderClients();
+            renderClientsManagementList();
+            updateStats();
+            populateClientSelect();
+        }
+        
+        // Mettre à jour les statistiques
+        function updateStats() {
+            // Statistiques factures
+            $("#totalInvoices").text(invoices.length);
+            
+            let totalAmount = 0;
+            let paidCount = 0;
+            let pendingCount = 0;
+            
+            invoices.forEach(inv => {
+                totalAmount += inv.totals.total;
+                if (inv.status === 'paid') paidCount++;
+                else if (inv.status === 'pending') pendingCount++;
+            });
+            
+            $("#totalAmount").text(totalAmount.toFixed(2));
+            $("#paidInvoices").text(paidCount);
+            $("#pendingInvoices").text(pendingCount);
+            
+            // Statistiques clients
+            $("#totalClients").text(clients.length);
+            $("#activeClients").text(clients.length); // Tous actifs par défaut
+            
+            let clientInvoices = 0;
+            let clientRevenue = 0;
+            
+            clients.forEach(client => {
+                const clientInvs = invoices.filter(inv => inv.clientId == client.id);
+                clientInvoices += clientInvs.length;
+                clientInvs.forEach(inv => clientRevenue += inv.totals.total);
+            });
+            
+            $("#clientInvoices").text(clientInvoices);
+            $("#clientRevenue").text(clientRevenue.toFixed(2));
+        }
+        
+        // Afficher les factures
+        function renderInvoices() {
+            const container = $("#invoicesList");
+            container.empty();
+            
+            if (invoices.length === 0) {
+                container.html(`
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune facture n'a été créée pour le moment.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+            
+            invoices.forEach(invoice => {
+                const dueDate = new Date(invoice.dueDate);
+                const today = new Date();
+                const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                let statusClass = 'pending';
+                let statusText = 'En attente';
+                
+                if (invoice.status === 'paid') {
+                    statusClass = 'paid';
+                    statusText = 'Payée';
+                } else if (daysLeft < 0) {
+                    statusClass = 'overdue';
+                    statusText = 'En retard';
+                }
+                
+                const card = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card invoice-card ${statusClass} h-100">
+                            <span class="status-badge bg-${statusClass === 'paid' ? 'success' : statusClass === 'overdue' ? 'danger' : 'warning'}">
+                                ${statusText}
+                            </span>
+                            <div class="card-body">
+                                <h5 class="card-title">${invoice.invoiceNumber}</h5>
+                                <p class="card-text mb-1"><strong>Client:</strong> ${invoice.clientCompany || invoice.client}</p>
+                                <p class="card-text mb-1"><strong>Date:</strong> ${invoice.issueDate}</p>
+                                <p class="card-text mb-1"><strong>Échéance:</strong> ${invoice.dueDate}</p>
+                                <p class="card-text mb-1"><strong>Statut:</strong> 
+                                    <span class="text-${statusClass === 'paid' ? 'success' : statusClass === 'overdue' ? 'danger' : 'warning'}">
+                                        ${statusText}
+                                    </span>
+                                </p>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="invoice-amount">€${invoice.totals.total.toFixed(2)}</div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-primary view-invoice-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success mark-paid-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-invoice-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.append(card);
+            });
+        }
+        
+        // Visualiser une facture
+        $(document).on('click', '.view-invoice-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (invoice) {
+                generateInvoicePreview(invoice);
+                $("#previewInvoiceModal").modal("show");
+            }
+        });
+        
+        // Marquer comme payée
+        $(document).on('click', '.mark-paid-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
+            
+            if (invoiceIndex !== -1) {
+                invoices[invoiceIndex].status = 'paid';
+                saveInvoices();
+                renderInvoices();
+            }
+        });
+        
+        // Supprimer une facture
+        $(document).on('click', '.delete-invoice-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) {
+                invoices = invoices.filter(inv => inv.id !== invoiceId);
+                saveInvoices();
+                renderInvoices();
+            }
+        });
+        
+
+
+
+        // Afficher les clients
+        function renderClients() {
+            const container = $("#clientsList");
+            container.empty();
+            
+            if (clients.length === 0) {
+                container.html(`
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucun client n'a été ajouté pour le moment.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+            
+            clients.forEach(client => {
+                const clientInvoices = invoices.filter(inv => inv.clientId == client.id).length;
+                
+                const card = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card client-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="client-avatar me-3">
+                                        ${client.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0">${client.name}</h5>
+                                        <p class="card-text mb-0">${client.company || 'Particulier'}</p>
+                                    </div>
+                                </div>
+                                
+                                <p class="card-text mb-1"><strong>Email:</strong> ${client.email || 'Non renseigné'}</p>
+                                <p class="card-text mb-1"><strong>Téléphone:</strong> ${client.phone || 'Non renseigné'}</p>
+                                <p class="card-text mb-1"><strong>Adresse:</strong> ${client.address ? client.address + ', ' + client.zip + ' ' + client.city : 'Non renseignée'}</p>
+                                
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="client-company">
+                                        ${clientInvoices} facture(s)
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-primary view-client-btn" data-id="${client.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-warning edit-client-btn" data-id="${client.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-client-btn" data-id="${client.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.append(card);
+            });
+        }
+        
+        // Afficher la liste des clients pour la gestion
+        function renderClientsManagementList() {
+            const container = $("#clientsManagementList");
+            container.empty();
+            
+            if (clients.length === 0) {
+                container.html(`
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucun client n'a été ajouté pour le moment.
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+            
+            clients.forEach(client => {
+                const clientInvoices = invoices.filter(inv => inv.clientId == client.id).length;
+                
+                const row = `
+                    <tr>
+                        <td>${client.name}</td>
+                        <td>${client.company || 'Particulier'}</td>
+                        <td>${client.phone || '-'}</td>
+                        <td>${client.email || '-'}</td>
+                        <td>
+                            <div class="d-flex">
+                                <button class="btn btn-sm btn-outline-warning me-2 edit-client-management-btn" data-id="${client.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-client-management-btn" data-id="${client.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                container.append(row);
+            });
+        }
+        
+        // Remplir la liste déroulante des clients
+        function populateClientSelect() {
+            const select = $("#clientSelect");
+            select.empty();
+            
+            clients.forEach(client => {
+                select.append(new Option(client.company ? `${client.company} (${client.name})` : client.name, client.id));
+            });
+        }
+        
+        // Ajouter un nouveau client
+        $("#addClientBtn").click(function() {
+            currentClientId = null;
+            $("#clientFormTitle").text("Ajouter un nouveau client");
+            $("#clientForm")[0].reset();
+            $("#clientsManagementContent").addClass("d-none");
+            $("#clientFormContainer").removeClass("d-none");
+        });
+        
+        // Annuler le formulaire client
+        $("#cancelClientForm").click(function() {
+            $("#clientFormContainer").addClass("d-none");
+            $("#clientsManagementContent").removeClass("d-none");
+        });
+        
+        // Soumettre le formulaire client
+        $("#clientForm").submit(function(e) {
+            e.preventDefault();
+            
+            const clientData = {
+                name: $("#clientName").val(),
+                company: $("#clientCompany").val(),
+                email: $("#clientEmail").val(),
+                phone: $("#clientPhone").val(),
+                address: $("#clientAddress").val(),
+                zip: $("#clientZip").val(),
+                city: $("#clientCity").val(),
+                notes: $("#clientNotes").val()
+            };
+            
+            if (currentClientId) {
+                // Mettre à jour le client existant
+                const index = clients.findIndex(c => c.id === currentClientId);
+                if (index !== -1) {
+                    clients[index] = {...clients[index], ...clientData};
+                }
+            } else {
+                // Ajouter un nouveau client
+                clientData.id = Date.now();
+                clients.push(clientData);
+            }
+            
+            saveData();
+            renderClients();
+            renderClientsManagementList();
+            populateClientSelect();
+            
+            $("#clientFormContainer").addClass("d-none");
+            $("#clientsManagementContent").removeClass("d-none");
+        });
+        
+        // Éditer un client (depuis la gestion)
+        $(document).on('click', '.edit-client-management-btn', function() {
+            const clientId = parseInt($(this).data('id'));
+            const client = clients.find(c => c.id === clientId);
+            
+            if (client) {
+                currentClientId = clientId;
+                $("#clientFormTitle").text("Modifier le client");
+                
+                // Remplir le formulaire
+                $("#clientName").val(client.name);
+                $("#clientCompany").val(client.company || '');
+                $("#clientEmail").val(client.email || '');
+                $("#clientPhone").val(client.phone || '');
+                $("#clientAddress").val(client.address || '');
+                $("#clientZip").val(client.zip || '');
+                $("#clientCity").val(client.city || '');
+                $("#clientNotes").val(client.notes || '');
+                
+                $("#clientsManagementContent").addClass("d-none");
+                $("#clientFormContainer").removeClass("d-none");
+            }
+        });
+        
+        // Supprimer un client (depuis la gestion)
+        $(document).on('click', '.delete-client-management-btn', function() {
+            const clientId = parseInt($(this).data('id'));
+            
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.")) {
+                clients = clients.filter(c => c.id !== clientId);
+                saveData();
+                renderClients();
+                renderClientsManagementList();
+                populateClientSelect();
+            }
+        });
+        
+        // Recherche de factures
+        $("#searchInvoices").on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $(".invoice-card").each(function() {
+                const cardText = $(this).text().toLowerCase();
+                $(this).closest('.col-md-6').toggle(cardText.includes(searchTerm));
+            });
+        });
+        
+        // Recherche de clients
+        $("#searchClients").on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $(".client-card").each(function() {
+                const cardText = $(this).text().toLowerCase();
+                $(this).closest('.col-md-6').toggle(cardText.includes(searchTerm));
+            });
+        });
+        
+        // Initialiser la navigation
+        updateStepNavigation();
+        calculateTotals();
+    });
+    </script>
+</body>
+</html>

@@ -21,6 +21,10 @@
             overflow-x: hidden;
             background-color: #edf2fa;
         }
+        a{
+            text-decoration: none!important;
+            color: initial;
+        }
         
         /* Sidebar */
         .sidebar {
@@ -1383,6 +1387,342 @@
         /*RH CSS*/
         .box-border{
             border-left: 5px solid var(--primary-color);
+        }
+
+
+        /*Facture et clients*/
+
+        .invoice-header, .client-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .invoice-logo {
+            max-height: 100px;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+        
+        .items-table td {
+            vertical-align: middle;
+        }
+        
+        .invoice-totals, .client-info-card {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            padding-top: 20px;
+        }
+        
+        .btn-add-item, .btn-add-client {
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .delete-item, .delete-client {
+            color: var(--danger-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .delete-item:hover, .delete-client:hover {
+            transform: scale(1.2);
+        }
+        
+        .signature-canvas {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: white;
+            cursor: crosshair;
+            margin-top: 10px;
+        }
+        
+        .signature-controls {
+            margin-top: 10px;
+        }
+        
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            border: none;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            border: none;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            /*border: none;*/
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .invoice-preview, .client-details {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tva-control {
+            max-width: 120px;
+        }
+        
+        .signature-preview {
+            max-width: 250px;
+            margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 45px;
+            font-size: 0.85rem;
+            text-align: center;
+            width: 100px;
+            left: -30px;
+            color: #777;
+            font-weight: 500;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            height: 3px;
+            width: calc(100% - 40px);
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .step-1 .step-label { left: 0; }
+        .step-2 .step-label { left: 33%; transform: translateX(-50%); }
+        .step-3 .step-label { right: 0; }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-bg));
+            color: white;
+            border-radius: 0 0 30px 30px;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .app-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .app-logo span {
+            color: var(--secondary-color);
+        }
+        
+        .feature-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .feature-card .card-body {
+            flex-grow: 1;
+        }
+        
+        .invoice-card, .client-card {
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s;
+        }
+        
+        .invoice-card:hover, .client-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .invoice-card.paid {
+            border-left-color: var(--success-color);
+        }
+        
+        .invoice-card.pending {
+            border-left-color: var(--warning-color);
+        }
+        
+        .invoice-card.overdue {
+            border-left-color: var(--danger-color);
+        }
+        
+        .client-card {
+            border-left-color: #9b59b6;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+            border-bottom: none;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #777;
+        }
+        
+        .invoice-list-header, .client-list-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .invoice-amount, .client-company {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+        
+        .stat-label {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons .btn {
+            margin: 0 5px;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .client-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
         }
 
         /* Responsive design */

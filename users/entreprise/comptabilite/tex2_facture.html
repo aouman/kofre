@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire de Factures</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-bg: #1a2530;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .invoice-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .invoice-logo {
+            max-height: 100px;
+            border-radius: 8px;
+            background: white;
+            padding: 8px;
+        }
+        
+        .items-table td {
+            vertical-align: middle;
+        }
+        
+        .invoice-totals {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            padding-top: 20px;
+        }
+        
+        .btn-add-item {
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .delete-item {
+            color: var(--danger-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .delete-item:hover {
+            transform: scale(1.2);
+        }
+        
+        .signature-canvas {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: white;
+            cursor: crosshair;
+            margin-top: 10px;
+        }
+        
+        .signature-controls {
+            margin-top: 10px;
+        }
+        
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            border: none;
+        }
+        
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            border: none;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .invoice-preview {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tva-control {
+            max-width: 120px;
+        }
+        
+        .signature-preview {
+            max-width: 250px;
+            margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .step.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 45px;
+            font-size: 0.85rem;
+            text-align: center;
+            width: 100px;
+            left: -30px;
+            color: #777;
+            font-weight: 500;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            height: 3px;
+            width: calc(100% - 40px);
+            background: #e0e0e0;
+            z-index: 1;
+        }
+        
+        .step-1 .step-label { left: 0; }
+        .step-2 .step-label { left: 33%; transform: translateX(-50%); }
+        .step-3 .step-label { right: 0; }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-bg));
+            color: white;
+            border-radius: 0 0 30px 30px;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .app-logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .app-logo span {
+            color: var(--secondary-color);
+        }
+        
+        .feature-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .feature-card .card-body {
+            flex-grow: 1;
+        }
+        
+        .invoice-card {
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s;
+        }
+        
+        .invoice-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .invoice-card.paid {
+            border-left-color: var(--success-color);
+        }
+        
+        .invoice-card.pending {
+            border-left-color: #f39c12;
+        }
+        
+        .invoice-card.overdue {
+            border-left-color: var(--danger-color);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #777;
+        }
+        
+        .invoice-list-header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .invoice-amount {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .filters-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+        
+        .stat-label {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons .btn {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="app-logo mb-3">Facture<span>Pro</span></div>
+                    <h1>Gestion complète de vos factures</h1>
+                    <p class="lead">Créez, gérez et signez vos factures en ligne</p>
+                    <button class="btn btn-light btn-lg mt-3" data-bs-toggle="modal" data-bs-target="#createInvoiceModal">
+                        <i class="fas fa-file-invoice me-2"></i>Créer une facture
+                    </button>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="https://images.unsplash.com/photo-1604594849809-dfedbc827105?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Facturation" class="img-fluid rounded shadow" style="max-height: 300px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <!-- Statistiques -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalInvoices">12</div>
+                    <div class="stat-label">Factures</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number">€<span id="totalAmount">8,450</span></div>
+                    <div class="stat-label">Montant total</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="paidInvoices">8</div>
+                    <div class="stat-label">Payées</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingInvoices">4</div>
+                    <div class="stat-label">En attente</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- En-tête de la liste -->
+        <div class="invoice-list-header">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h2 class="mb-0">Liste des Factures</h2>
+                </div>
+                <div class="col-md-6">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control ps-4" id="searchInvoices" placeholder="Rechercher...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="filters-container">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Statut</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="all">Tous les statuts</option>
+                        <option value="paid">Payées</option>
+                        <option value="pending">En attente</option>
+                        <option value="overdue">En retard</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Client</label>
+                    <select class="form-select" id="filterClient">
+                        <option value="all">Tous les clients</option>
+                        <option value="Société ABC">Société ABC</option>
+                        <option value="Entreprise XYZ">Entreprise XYZ</option>
+                        <option value="Particulier">Particulier</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Date de début</label>
+                    <input type="date" class="form-control" id="filterStartDate">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Date de fin</label>
+                    <input type="date" class="form-control" id="filterEndDate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-end">
+                    <button class="btn btn-outline-secondary me-2" id="resetFilters">
+                        <i class="fas fa-redo me-2"></i>Réinitialiser
+                    </button>
+                    <button class="btn btn-primary" id="applyFilters">
+                        <i class="fas fa-filter me-2"></i>Appliquer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des factures -->
+        <div class="row" id="invoicesList">
+            <!-- Les factures seront chargées ici dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Modal Création Facture -->
+    <div class="modal fade" id="createInvoiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nouvelle Facture</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="step-indicator mb-5">
+                        <div class="step active step-1">
+                            <span>1</span>
+                            <div class="step-label">Information</div>
+                        </div>
+                        <div class="step step-2">
+                            <span>2</span>
+                            <div class="step-label">Articles</div>
+                        </div>
+                        <div class="step step-3">
+                            <span>3</span>
+                            <div class="step-label">Validation</div>
+                        </div>
+                    </div>
+                    
+                    <form id="invoiceForm">
+                        <!-- Étape 1: Informations de base -->
+                        <div class="step-content step-1-content">
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Émetteur</label>
+                                    <input type="text" class="form-control" placeholder="Votre entreprise" value="Entreprise Facturée">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Adresse</label>
+                                    <input type="text" class="form-control" placeholder="Adresse" value="123 Rue du Commerce, Paris">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Client</label>
+                                    <select class="form-select" id="clientSelect">
+                                        <option value="1">Société ABC</option>
+                                        <option value="2">Entreprise XYZ</option>
+                                        <option value="3">Particulier</option>
+                                        <option value="4">Autre...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Date d'échéance</label>
+                                    <input type="date" class="form-control" id="dueDate">
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">N° de facture</label>
+                                    <input type="text" class="form-control" value="INV-2023-001" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Date de facturation</label>
+                                    <input type="date" class="form-control" value="" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Étape 2: Articles et TVA -->
+                        <div class="step-content step-2-content d-none">
+                            <h5 class="mb-4">Articles</h5>
+                            <table class="table items-table">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th width="12%">Qté</th>
+                                        <th width="18%">Prix Unitaire</th>
+                                        <th width="20%">Total</th>
+                                        <th width="5%"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody">
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control item-description" placeholder="Description de l'article" value="Consultation">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control item-quantity" value="2" min="1">
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">€</span>
+                                                <input type="number" class="form-control item-price" value="150" min="0" step="0.01">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">€</span>
+                                                <input type="text" class="form-control item-total" value="300.00" readonly>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-trash delete-item"></i>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="text" class="form-control item-description" placeholder="Description de l'article" value="Développement web">
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control item-quantity" value="1" min="1">
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">€</span>
+                                                <input type="number" class="form-control item-price" value="850" min="0" step="0.01">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <span class="input-group-text">€</span>
+                                                <input type="text" class="form-control item-total" value="850.00" readonly>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-trash delete-item"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" id="addItemBtn" class="btn btn-outline-primary btn-add-item mb-4">
+                                <i class="fas fa-plus me-2"></i>Ajouter un article
+                            </button>
+                            
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Notes</label>
+                                    <textarea class="form-control" rows="3" placeholder="Notes supplémentaires...">Paiement dans les 30 jours suivant réception</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label mb-0">Taux de TVA (%)</label>
+                                        <div class="tva-control">
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="taxRate" value="20" min="0" max="100" step="0.1">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="invoice-totals p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Sous-total:</span>
+                                            <span id="subtotal">€1,150.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <span>TVA (<span id="taxRateLabel">20</span>%):</span>
+                                            <span id="tax">€230.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2 fw-bold fs-5">
+                                            <span>Total:</span>
+                                            <span id="total">€1,380.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Étape 3: Récapitulatif -->
+                        <div class="step-content step-3-content d-none">
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>Votre facture est prête à être générée
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5>À</h5>
+                                            <p id="summaryClient">Société ABC</p>
+                                            <p>Adresse Client</p>
+                                            <p>CP Ville</p>
+                                        </div>
+                                        <div class="col-md-6 text-end">
+                                            <h5>De</h5>
+                                            <p>Entreprise Facturée</p>
+                                            <p>123 Rue du Commerce, Paris</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-end">Qté</th>
+                                            <th class="text-end">Prix Unitaire</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryItems">
+                                        <tr>
+                                            <td>Consultation</td>
+                                            <td class="text-end">2</td>
+                                            <td class="text-end">€150.00</td>
+                                            <td class="text-end">€300.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Développement web</td>
+                                            <td class="text-end">1</td>
+                                            <td class="text-end">€850.00</td>
+                                            <td class="text-end">€850.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="row justify-content-end">
+                                <div class="col-md-5">
+                                    <div class="invoice-totals p-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Sous-total:</span>
+                                            <span id="summarySubtotal">€1,150.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <span>TVA (20%):</span>
+                                            <span id="summaryTax">€230.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-2 fw-bold fs-5">
+                                            <span>Total:</span>
+                                            <span id="summaryTotal">€1,380.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="prevStepBtn" style="display:none;">
+                        <i class="fas fa-arrow-left me-2"></i>Précédent
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="nextStepBtn">
+                        Suivant<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <button type="button" id="generateInvoiceBtn" class="btn btn-success" style="display:none;">
+                        <i class="fas fa-file-invoice me-2"></i>Générer la Facture
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aperçu Facture -->
+    <div class="modal fade" id="previewInvoiceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Aperçu de la Facture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="invoicePreview">
+                    <!-- Contenu de la facture généré dynamiquement -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="button" id="printInvoiceBtn" class="btn btn-primary">
+                        <i class="fas fa-print me-2"></i>Imprimer
+                    </button>
+                    <button type="button" id="downloadPdfBtn" class="btn btn-success">
+                        <i class="fas fa-download me-2"></i>Télécharger PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // Variables globales
+        let currentStep = 1;
+        let signatureData = null;
+        let invoices = [];
+        
+        // Initialiser la date d'échéance
+        const today = new Date();
+        const dueDate = new Date();
+        dueDate.setDate(today.getDate() + 30);
+        $("#dueDate").val(dueDate.toISOString().split('T')[0]);
+        $("input[type='date'][readonly]").val(today.toISOString().split('T')[0]);
+        
+        // Navigation entre les étapes
+        function updateStepNavigation() {
+            // Mettre à jour l'indicateur d'étape
+            $('.step').removeClass('active completed');
+            $(`.step-${currentStep}`).addClass('active');
+            
+            for (let i = 1; i < currentStep; i++) {
+                $(`.step-${i}`).addClass('completed');
+            }
+            
+            // Afficher/masquer le contenu des étapes
+            $('.step-content').addClass('d-none');
+            $(`.step-${currentStep}-content`).removeClass('d-none');
+            
+            // Gérer les boutons de navigation
+            if (currentStep === 1) {
+                $('#prevStepBtn').hide();
+                $('#nextStepBtn').show();
+                $('#generateInvoiceBtn').hide();
+            } else if (currentStep === 2) {
+                $('#prevStepBtn').show();
+                $('#nextStepBtn').show();
+                $('#generateInvoiceBtn').hide();
+            } else if (currentStep === 3) {
+                $('#prevStepBtn').show();
+                $('#nextStepBtn').hide();
+                $('#generateInvoiceBtn').show();
+                
+                // Mettre à jour le récapitulatif
+                updateSummary();
+            }
+        }
+        
+        // Mettre à jour le récapitulatif
+        function updateSummary() {
+            $('#summaryClient').text($("#clientSelect option:selected").text());
+            $('#summarySubtotal').text($("#subtotal").text());
+            $('#summaryTax').text($("#tax").text());
+            $('#summaryTotal').text($("#total").text());
+            
+            // Mettre à jour les articles
+            let itemsHtml = '';
+            $("#itemsTableBody tr").each(function() {
+                const desc = $(this).find(".item-description").val() || 'Article';
+                const qty = $(this).find(".item-quantity").val() || 1;
+                const price = parseFloat($(this).find(".item-price").val()) || 0;
+                const total = (qty * price).toFixed(2);
+                
+                itemsHtml += `
+                    <tr>
+                        <td>${desc}</td>
+                        <td class="text-end">${qty}</td>
+                        <td class="text-end">€${price.toFixed(2)}</td>
+                        <td class="text-end">€${total}</td>
+                    </tr>
+                `;
+            });
+            
+            $("#summaryItems").html(itemsHtml);
+        }
+        
+        // Événements de navigation
+        $('#nextStepBtn').click(function() {
+            if (currentStep < 3) {
+                currentStep++;
+                updateStepNavigation();
+            }
+        });
+        
+        $('#prevStepBtn').click(function() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepNavigation();
+            }
+        });
+        
+        // Ajouter un nouvel article
+        $("#addItemBtn").click(function() {
+            const newRow = `
+                <tr>
+                    <td><input type="text" class="form-control item-description" placeholder="Description de l'article"></td>
+                    <td><input type="number" class="form-control item-quantity" value="1" min="1"></td>
+                    <td>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control item-price" value="0" min="0" step="0.01">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="text" class="form-control item-total" value="0.00" readonly>
+                        </div>
+                    </td>
+                    <td><i class="fas fa-trash delete-item"></i></td>
+                </tr>`;
+            $("#itemsTableBody").append(newRow);
+        });
+
+        // Supprimer un article
+        $(document).on("click", ".delete-item", function() {
+            if($("#itemsTableBody tr").length > 1) {
+                $(this).closest("tr").remove();
+                calculateTotals();
+            }
+        });
+
+        // Calcul des totaux
+        function calculateTotals() {
+            let subtotal = 0;
+            
+            $("#itemsTableBody tr").each(function() {
+                const qty = parseFloat($(this).find(".item-quantity").val()) || 0;
+                const price = parseFloat($(this).find(".item-price").val()) || 0;
+                const total = qty * price;
+                
+                subtotal += total;
+                $(this).find(".item-total").val(total.toFixed(2));
+            });
+            
+            const taxRate = parseFloat($("#taxRate").val()) || 0;
+            const tax = subtotal * (taxRate / 100);
+            const total = subtotal + tax;
+            
+            $("#subtotal").text("€" + subtotal.toFixed(2));
+            $("#tax").text("€" + tax.toFixed(2));
+            $("#total").text("€" + total.toFixed(2));
+            $("#taxRateLabel").text(taxRate);
+            
+            return { subtotal, tax, total, taxRate };
+        }
+
+        // Écouteurs de modification
+        $(document).on("input", ".item-quantity, .item-price", calculateTotals);
+        $("#taxRate").on("input", calculateTotals);
+
+        // Générer la facture
+        $("#generateInvoiceBtn").click(function() {
+            const invoiceData = {
+                id: Date.now(),
+                client: $("#clientSelect option:selected").text(),
+                dueDate: $("#dueDate").val(),
+                items: [],
+                totals: calculateTotals(),
+                invoiceNumber: "INV-" + Math.floor(1000 + Math.random() * 9000),
+                issueDate: new Date().toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }),
+                status: 'pending'
+            };
+            
+            $("#itemsTableBody tr").each(function() {
+                invoiceData.items.push({
+                    description: $(this).find(".item-description").val() || "Article",
+                    quantity: $(this).find(".item-quantity").val() || 1,
+                    price: $(this).find(".item-price").val() || 0,
+                    total: $(this).find(".item-total").val() || "0.00"
+                });
+            });
+            
+            // Ajouter la facture à la liste
+            invoices.push(invoiceData);
+            saveInvoices();
+            renderInvoices();
+            
+            generateInvoicePreview(invoiceData);
+            $("#createInvoiceModal").modal("hide");
+            $("#previewInvoiceModal").modal("show");
+        });
+
+        // Générer l'aperçu HTML de la facture
+        function generateInvoicePreview(data) {
+            const itemsHtml = data.items.map(item => `
+                <tr>
+                    <td>${item.description}</td>
+                    <td class="text-end">${item.quantity}</td>
+                    <td class="text-end">€${parseFloat(item.price).toFixed(2)}</td>
+                    <td class="text-end">€${item.total}</td>
+                </tr>
+            `).join('');
+            
+            const invoiceHtml = `
+                <div class="invoice-container p-4">
+                    <div class="invoice-header p-4 mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h1 class="display-5">FACTURE</h1>
+                                <p class="mb-1"><strong>N°:</strong> ${data.invoiceNumber}</p>
+                                <p class="mb-1"><strong>Date:</strong> ${data.issueDate}</p>
+                                <p class="mb-0"><strong>Échéance:</strong> ${data.dueDate}</p>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <div class="d-flex flex-column align-items-end">
+                                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" class="invoice-logo mb-2">
+                                    <p class="mb-0 fw-bold">Entreprise Facturée</p>
+                                    <p class="mb-0">123 Rue du Commerce</p>
+                                    <p class="mb-0">75000 Paris</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Client</h5>
+                            <p class="mb-1 fw-bold">${data.client}</p>
+                            <p class="mb-0">Adresse Client</p>
+                            <p class="mb-0">CP Ville</p>
+                        </div>
+                    </div>
+                    
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Quantité</th>
+                                <th class="text-end">Prix Unitaire</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+                    
+                    <div class="row justify-content-end">
+                        <div class="col-md-4">
+                            <div class="invoice-totals p-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Sous-total:</span>
+                                    <span>€${data.totals.subtotal.toFixed(2)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <span>TVA (${data.totals.taxRate}%):</span>
+                                    <span>€${data.totals.tax.toFixed(2)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mt-2 fw-bold fs-5">
+                                    <span>Total:</span>
+                                    <span>€${data.totals.total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signature-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Signature du client</h5>
+                                <div id="signatureCanvasContainer">
+                                    <canvas id="signatureCanvas" width="400" height="150" class="signature-canvas"></canvas>
+                                    <div class="signature-controls">
+                                        <button id="clearSignatureBtn" class="btn btn-sm btn-outline-danger me-2">
+                                            <i class="fas fa-eraser me-1"></i>Effacer
+                                        </button>
+                                        <button id="saveSignatureBtn" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check me-1"></i>Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Signature de l'émetteur</h5>
+                                <div class="d-flex align-items-center" style="height: 150px; background-color: #f8f9fa; border-radius: 8px; padding: 15px;">
+                                    <div class="text-center w-100">
+                                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="rounded-circle mb-2" width="60">
+                                        <p class="mb-0 fw-bold">Jean Dupont</p>
+                                        <p class="mb-0 text-muted">Directeur</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-5 pt-3 border-top text-center text-muted">
+                        <p class="mb-0">Merci pour votre confiance !</p>
+                        <p class="mb-0">Entreprise Facturée - SIRET: 123 456 789 00010 - TVA Intra: FR00123456789</p>
+                    </div>
+                </div>
+            `;
+            
+            $("#invoicePreview").html(invoiceHtml);
+            initSignaturePad();
+        }
+
+        // Initialiser le pad de signature
+        function initSignaturePad() {
+            const canvas = document.getElementById("signatureCanvas");
+            const ctx = canvas.getContext("2d");
+            
+            // Réinitialiser le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Variables pour le dessin
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+            
+            // Fonctions de dessin
+            function startDrawing(e) {
+                isDrawing = true;
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                
+                [lastX, lastY] = [e.offsetX, e.offsetY];
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            // Événements
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Effacer la signature
+            $("#clearSignatureBtn").click(function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+            
+            // Sauvegarder la signature
+            $("#saveSignatureBtn").click(function() {
+                signatureData = canvas.toDataURL();
+                $(this).html('<i class="fas fa-check me-1"></i>Signature enregistrée').addClass('disabled');
+                $("#clearSignatureBtn").prop('disabled', true);
+                canvas.style.border = "2px solid #27ae60";
+            });
+        }
+
+        // Imprimer la facture
+        $("#printInvoiceBtn").click(function() {
+            const printContent = $("#invoicePreview").html();
+            const originalContent = $("body").html();
+            
+            $("body").html(printContent);
+            window.print();
+            $("body").html(originalContent);
+            $("#previewInvoiceModal").modal("show");
+        });
+
+        // Télécharger PDF (simulé)
+        $("#downloadPdfBtn").click(function() {
+            alert("Fonction PDF non implémentée dans cet exemple. En production, utiliser une librairie comme jsPDF ou window.print()");
+        });
+        
+        // Sauvegarder les factures dans localStorage
+        function saveInvoices() {
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            updateStats();
+        }
+        
+        // Charger les factures depuis localStorage
+        function loadInvoices() {
+            const savedInvoices = localStorage.getItem('invoices');
+            if (savedInvoices) {
+                invoices = JSON.parse(savedInvoices);
+            }
+            renderInvoices();
+            updateStats();
+        }
+        
+        // Mettre à jour les statistiques
+        function updateStats() {
+            $("#totalInvoices").text(invoices.length);
+            
+            let totalAmount = 0;
+            let paidCount = 0;
+            let pendingCount = 0;
+            
+            invoices.forEach(inv => {
+                totalAmount += inv.totals.total;
+                if (inv.status === 'paid') paidCount++;
+                else if (inv.status === 'pending') pendingCount++;
+            });
+            
+            $("#totalAmount").text(totalAmount.toFixed(2));
+            $("#paidInvoices").text(paidCount);
+            $("#pendingInvoices").text(pendingCount);
+        }
+        
+        // Afficher les factures
+        function renderInvoices() {
+            const container = $("#invoicesList");
+            container.empty();
+            
+            if (invoices.length === 0) {
+                container.html(`
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune facture n'a été créée pour le moment.
+                        </div>
+                    </div>
+                `);
+                return;
+            }
+            
+            invoices.forEach(invoice => {
+                const dueDate = new Date(invoice.dueDate);
+                const today = new Date();
+                const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                let statusClass = 'pending';
+                let statusText = 'En attente';
+                
+                if (invoice.status === 'paid') {
+                    statusClass = 'paid';
+                    statusText = 'Payée';
+                } else if (daysLeft < 0) {
+                    statusClass = 'overdue';
+                    statusText = 'En retard';
+                }
+                
+                const card = `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card invoice-card ${statusClass} h-100">
+                            <span class="status-badge bg-${statusClass === 'paid' ? 'success' : statusClass === 'overdue' ? 'danger' : 'warning'}">
+                                ${statusText}
+                            </span>
+                            <div class="card-body">
+                                <h5 class="card-title">${invoice.invoiceNumber}</h5>
+                                <p class="card-text mb-1"><strong>Client:</strong> ${invoice.client}</p>
+                                <p class="card-text mb-1"><strong>Date:</strong> ${invoice.issueDate}</p>
+                                <p class="card-text mb-1"><strong>Échéance:</strong> ${invoice.dueDate}</p>
+                                <p class="card-text mb-1"><strong>Statut:</strong> 
+                                    <span class="text-${statusClass === 'paid' ? 'success' : statusClass === 'overdue' ? 'danger' : 'warning'}">
+                                        ${statusText}
+                                    </span>
+                                </p>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="invoice-amount">€${invoice.totals.total.toFixed(2)}</div>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-primary view-invoice-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success mark-paid-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger delete-invoice-btn" data-id="${invoice.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.append(card);
+            });
+        }
+        
+        // Visualiser une facture
+        $(document).on('click', '.view-invoice-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            const invoice = invoices.find(inv => inv.id === invoiceId);
+            if (invoice) {
+                generateInvoicePreview(invoice);
+                $("#previewInvoiceModal").modal("show");
+            }
+        });
+        
+        // Marquer comme payée
+        $(document).on('click', '.mark-paid-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            const invoiceIndex = invoices.findIndex(inv => inv.id === invoiceId);
+            
+            if (invoiceIndex !== -1) {
+                invoices[invoiceIndex].status = 'paid';
+                saveInvoices();
+                renderInvoices();
+            }
+        });
+        
+        // Supprimer une facture
+        $(document).on('click', '.delete-invoice-btn', function() {
+            const invoiceId = parseInt($(this).data('id'));
+            
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette facture ?")) {
+                invoices = invoices.filter(inv => inv.id !== invoiceId);
+                saveInvoices();
+                renderInvoices();
+            }
+        });
+        
+        // Recherche de factures
+        $("#searchInvoices").on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            $(".invoice-card").each(function() {
+                const cardText = $(this).text().toLowerCase();
+                $(this).toggle(cardText.includes(searchTerm));
+            });
+        });
+        
+        // Appliquer les filtres
+        $("#applyFilters").click(function() {
+            const status = $("#filterStatus").val();
+            const client = $("#filterClient").val();
+            const startDate = $("#filterStartDate").val();
+            const endDate = $("#filterEndDate").val();
+            
+            $(".invoice-card").each(function() {
+                const cardStatus = $(this).hasClass('paid') ? 'paid' : 
+                                  $(this).hasClass('overdue') ? 'overdue' : 'pending';
+                const cardClient = $(this).find(".card-text:contains('Client:')").text().replace('Client:', '').trim();
+                const dueDate = $(this).find(".card-text:contains('Échéance:')").text().replace('Échéance:', '').trim();
+                
+                let show = true;
+                
+                // Filtre par statut
+                if (status !== 'all' && cardStatus !== status) show = false;
+                
+                // Filtre par client
+                if (client !== 'all' && cardClient !== client) show = false;
+                
+                // Filtre par date
+                if (startDate && dueDate < startDate) show = false;
+                if (endDate && dueDate > endDate) show = false;
+                
+                $(this).closest('.col-md-6').toggle(show);
+            });
+        });
+        
+        // Réinitialiser les filtres
+        $("#resetFilters").click(function() {
+            $("#filterStatus").val('all');
+            $("#filterClient").val('all');
+            $("#filterStartDate").val('');
+            $("#filterEndDate").val('');
+            $(".invoice-card").closest('.col-md-6').show();
+        });
+        
+        // Initialiser la navigation
+        updateStepNavigation();
+        calculateTotals();
+        loadInvoices();
+    });
+    </script>
+</body>
+</html>

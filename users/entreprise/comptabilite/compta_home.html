@@ -140,6 +140,279 @@
             </div>
         </header>
         <div class="container-fluid py-4">
+            <div class="row g-4 mb-4">
+                <!-- buttons des liens de comptabilité -->
+                <a href="#" class="col-xl-3 col-md-6">
+                    <div class="stock-card">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-bar-chart-line fs-1 text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Rapports</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/koffre/users/entreprise/comptabilite/factures.html" class="col-xl-3 col-md-6">
+                    <div class="stock-card">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-file-text fs-1 text-danger"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Factures</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/koffre/users/entreprise/comptabilite/transaction.html" class="col-xl-3 col-md-6">
+                    <div class="stock-card">
+                        <div class="d-flex justify-content-around align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-arrow-left-right fs-1 text-primary"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Transactions</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="#" class="col-xl-3 col-md-6">
+                    <div class="stock-card">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="bi bi-calculator fs-1 text-warning"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Tous les factures</h6>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Navigation par onglets -->
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab">
+                    <i class="fas fa-file-invoice me-2"></i>Factures
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="clients-tab" data-bs-toggle="tab" data-bs-target="#clients" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Clients
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Contenu des onglets -->
+        <div class="tab-content" id="mainTabsContent">
+            <!-- Onglet Factures -->
+            <div class="tab-pane fade show active" id="invoices" role="tabpanel">
+                <!-- Statistiques -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalInvoices">0</div>
+                            <div class="stat-label">Factures</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">€<span id="totalAmount">0</span></div>
+                            <div class="stat-label">Montant total</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="paidInvoices">0</div>
+                            <div class="stat-label">Payées</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="pendingInvoices">0</div>
+                            <div class="stat-label">En attente</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- En-tête de la liste -->
+                <div class="invoice-list-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h2 class="mb-0">Liste des Factures</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control ps-4" id="searchInvoices" placeholder="Rechercher...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des factures -->
+                <div class="row" id="invoicesList">
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucune facture n'a été créée pour le moment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Onglet Clients -->
+            <div class="tab-pane fade" id="clients" role="tabpanel">
+                <!-- Statistiques clients -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalClients">0</div>
+                            <div class="stat-label">Clients</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="activeClients">0</div>
+                            <div class="stat-label">Actifs</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number" id="clientInvoices">0</div>
+                            <div class="stat-label">Factures totales</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-number">€<span id="clientRevenue">0</span></div>
+                            <div class="stat-label">Revenus clients</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- En-tête de la liste des clients -->
+                <div class="client-list-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h2 class="mb-0">Liste des Clients</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" id="addClientBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                            Launch demo modal
+                            </button>
+                            <button type="button" class="btn btn-success" >
+                                <i class="fas fa-plus me-2"></i>Ajouter un client
+                            </button>
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control ps-4" id="searchClients" placeholder="Rechercher...">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Modal Formulaire d'ajout/modification de client -->
+             
+                                <div id="clientFormContainer" class="">
+                                    <h5 class="mb-4" id="clientFormTitle">Ajouter un nouveau client</h5>
+                                    <form id="clientForm">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Nom complet</label>
+                                                <input type="text" class="form-control" id="clientName" placeholder="Prénom Nom" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Société</label>
+                                                <input type="text" class="form-control" id="clientCompany" placeholder="Nom de l'entreprise">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="clientEmail" placeholder="email@exemple.com">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Téléphone</label>
+                                                <input type="tel" class="form-control" id="clientPhone" placeholder="01 23 45 67 89">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Adresse</label>
+                                                <input type="text" class="form-control" id="clientAddress" placeholder="Adresse">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Code Postal</label>
+                                                <input type="text" class="form-control" id="clientZip" placeholder="Code postal">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Ville</label>
+                                                <input type="text" class="form-control" id="clientCity" placeholder="Ville">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label">Notes</label>
+                                                <textarea class="form-control" id="clientNotes" rows="3" placeholder="Informations supplémentaires"></textarea>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-end mt-4">
+                                            <button type="button" class="btn btn-secondary me-2" id="cancelClientForm">
+                                                Annuler
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-2"></i>Enregistrer
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!--div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div-->
+                            </div>
+                        </div>
+
+                    
+                </div>
+
+                <!-- Liste des clients -->
+                <div class="row" id="clientsList">
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Aucun client n'a été ajouté pour le moment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
             <div class="modern-tabs">
                 <!-- Navigation des onglets -->
                 <ul class="nav nav-tabs-modern" id="accountingTabs" role="tablist">
@@ -159,8 +432,8 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="taxes-tab" data-bs-toggle="tab" data-bs-target="#taxes" type="button">
-                            <i class="bi bi-calculator me-2"></i>Taxes
+                        <button class="nav-link" id="allinvoices-tab" data-bs-toggle="tab" data-bs-target="#allinvoices" type="button">
+                            <i class="bi bi-calculator me-2"></i>Tous les factures
                         </button>
                     </li>
                 </ul>
@@ -497,7 +770,7 @@
                     </div>
 
                     <!-- Taxes -->
-                    <div class="tab-pane fade" id="taxes">
+                    <div class="tab-pane fade" id="allinvoices">
                         <div class="row g-4">
                             <div class="col-lg-6">
                                 <div class="finance-card">
@@ -545,9 +818,9 @@
         </div>
 
         <!-- Bouton flottant -->
-        <button class="floating-action-btn">
+        <!--button class="floating-action-btn">
             <i class="bi bi-plus-lg"></i>
-        </button>
+        </button-->
     </main>
     
     <!-- Bootstrap 5 JS Bundle with Popper -->
